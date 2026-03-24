@@ -297,6 +297,69 @@
         </svg>
       </div>
     </section>
+
+    <section id="task7" class="card reveal">
+      <div class="card-head">
+        <h2>7. Action Potentials</h2>
+        <p>Zoom into a node of Ranvier membrane and track how Na+ and K+ channels coordinate depolarization and repolarization.</p>
+      </div>
+
+      <div class="ap-grid">
+        <div class="ap-stage" aria-label="Node of Ranvier phospholipid bilayer model">
+          <div id="apNodeModel" class="ap-node-model phase-resting">
+            <p class="ap-side-label ap-side-out">outside</p>
+            <p class="ap-side-label ap-side-in">inside</p>
+
+            <div class="ap-bilayer ap-bilayer-top" aria-hidden="true"></div>
+            <div class="ap-bilayer ap-bilayer-bottom" aria-hidden="true"></div>
+            <div class="ap-core" aria-hidden="true"></div>
+
+            <div id="apNaChannel" class="ap-channel ap-channel-na" aria-label="Voltage-gated sodium channel">
+              <span class="ap-channel-tag">Na+</span>
+              <span class="ap-gate"></span>
+            </div>
+
+            <div id="apPump" class="ap-pump" aria-label="Sodium potassium ATPase pump">
+              <span class="ap-pump-label">Na+/K+ ATPase</span>
+            </div>
+
+            <div id="apKChannel" class="ap-channel ap-channel-k" aria-label="Voltage-gated potassium channel">
+              <span class="ap-channel-tag">K+</span>
+              <span class="ap-gate"></span>
+            </div>
+
+            <span class="ap-ion ap-ion-na ap-ion-na-1" aria-hidden="true">Na+</span>
+            <span class="ap-ion ap-ion-na ap-ion-na-2" aria-hidden="true">Na+</span>
+            <span class="ap-ion ap-ion-na ap-ion-na-3" aria-hidden="true">Na+</span>
+            <span class="ap-ion ap-ion-k ap-ion-k-1" aria-hidden="true">K+</span>
+            <span class="ap-ion ap-ion-k ap-ion-k-2" aria-hidden="true">K+</span>
+
+            <div class="ap-charge ap-charge-out" aria-hidden="true">+</div>
+            <div class="ap-charge ap-charge-in" aria-hidden="true">-</div>
+          </div>
+        </div>
+
+        <div class="ap-panel">
+          <h3>Phase Controls</h3>
+          <p id="apPhaseLabel" class="salt-status">Phase: Resting potential</p>
+          <p id="apStatus" class="structure-text">Voltage-gated Na+ and K+ channels are closed. Na+/K+ ATPase maintains ion gradients.</p>
+
+          <div class="button-row">
+            <button id="apPlayPause" class="btn" type="button">Play</button>
+            <button id="apStep" class="btn btn-ghost" type="button">Step</button>
+            <button id="apReset" class="btn btn-ghost" type="button">Reset</button>
+          </div>
+
+          <ol class="ap-phase-list" id="apPhaseList" aria-label="Action potential phases">
+            <li data-phase="resting" class="active">Resting potential</li>
+            <li data-phase="depolarization">Depolarization (Na+ channels open)</li>
+            <li data-phase="repolarization">Repolarization (K+ channels open)</li>
+            <li data-phase="hyperpolarization">Hyperpolarization</li>
+            <li data-phase="recovery">Recovery (ATPase reset)</li>
+          </ol>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer reveal">

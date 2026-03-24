@@ -1421,7 +1421,11 @@ function setupNerveImpulseMeasurement() {
     const c1y = from.y;
     const c2x = to.x - dir * bend;
     const c2y = to.y;
-    pathEl.setAttribute("d", `M ${from.x.toFixed(2)} ${from.y.toFixed(2)} C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${to.x.toFixed(2)} ${to.y.toFixed(2)}`);
+    return `M ${from.x.toFixed(2)} ${from.y.toFixed(2)} C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${to.x.toFixed(2)} ${to.y.toFixed(2)}`;
+  }
+
+  function setWire(pathEl, from, to) {
+    pathEl.setAttribute("d", drawWire(pathEl, from, to));
   }
 
   function bankAnchorInGrid(ratioY) {
@@ -1439,8 +1443,27 @@ function setupNerveImpulseMeasurement() {
   }
 
   function updateBankConnectionWires() {
-    drawWire(wireBankA, bankAnchorInGrid(0.35), elementCenterInGrid(jackA));
-    drawWire(wireBankB, bankAnchorInGrid(0.72), elementCenterInGrid(jackB));
+    const narrowScreen = window.matchMedia("(max-width: 900px)").matches;
+    const jackAPoint = elementCenterInGrid(jackA);
+    const jackBPoint = elementCenterInGrid(jackB);
+
+    if (narrowScreen) {
+      const bankMid = bankAnchorInGrid(0.53);
+      const trunkJoin = {
+        x: Math.min(jackAPoint.x, jackBPoint.x) - 26,
+        y: (jackAPoint.y + jackBPoint.y) / 2
+      };
+
+      const trunk = drawWire(wireBankA, bankMid, trunkJoin);
+      const branchA = drawWire(wireBankA, trunkJoin, jackAPoint);
+      wireBankA.setAttribute("d", `${trunk} ${branchA}`);
+
+      setWire(wireBankB, trunkJoin, jackBPoint);
+      return;
+    }
+
+    setWire(wireBankA, bankAnchorInGrid(0.35), jackAPoint);
+    setWire(wireBankB, bankAnchorInGrid(0.72), jackBPoint);
   }
 
   function updateWires(pointerById = {}) {
@@ -1458,7 +1481,7 @@ function setupNerveImpulseMeasurement() {
         leadWire.setAttribute("d", "");
       } else {
         const leadStart = pointerById[id] || electrodeBackInGrid(electrode);
-        drawWire(leadWire, leadStart, bankAnchor);
+        setWire(leadWire, leadStart, bankAnchor);
       }
 
       // Direct electrode-to-jack paths are intentionally hidden so each electrode
@@ -1790,6 +1813,116 @@ function setupNerveImpulseMeasurement() {
   startScopeAnimation();
 }
 
+function setupActionPotentials() {
+  const model = document.getElementById("apNodeModel");
+  const phaseLabel = document.getElementById("apPhaseLabel");
+  const status = document.getElementById("apStatus");
+  const phaseList = document.getElementById("apPhaseList");
+  const playPauseBtn = document.getElementById("apPlayPause");
+  const stepBtn = document.getElementById("apStep");
+  const resetBtn = document.getElementById("apReset");
+
+  if (!model || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn) {
+    return;
+  }
+
+  const phases = [
+    {
+      id: "resting",
+      label: "Resting potential",
+      text: "Voltage-gated Na+ and K+ channels are closed. Na+/K+ ATPase maintains ion gradients."
+    },
+    {
+      id: "depolarization",
+      label: "Depolarization",
+      text: "Voltage-gated Na+ channels open. Na+ rushes into the axon at this node of Ranvier."
+    },
+    {
+      id: "repolarization",
+      label: "Repolarization",
+      text: "Na+ channels inactivate while voltage-gated K+ channels open, driving K+ out of the cell."
+    },
+    {
+      id: "hyperpolarization",
+      label: "Hyperpolarization",
+      text: "K+ channels remain open briefly, causing membrane potential to dip below resting level."
+    },
+    {
+      id: "recovery",
+      label: "Recovery",
+      text: "Na+/K+ ATPase helps restore the baseline ionic distribution for the next impulse."
+    }
+  ];
+
+  let phaseIndex = 0;
+  let isPlaying = false;
+  let timer = null;
+
+  function applyPhase() {
+    const phase = phases[phaseIndex];
+    model.className = `ap-node-model phase-${phase.id}`;
+    phaseLabel.textContent = `Phase: ${phase.label}`;
+    status.textContent = phase.text;
+
+    phaseList.querySelectorAll("li[data-phase]").forEach((item) => {
+      item.classList.toggle("active", item.dataset.phase === phase.id);
+    });
+  }
+
+  function stopPlayback() {
+    if (timer) {
+      clearInterval(timer);
+      timer = null;
+    }
+    isPlaying = false;
+    playPauseBtn.textContent = "Play";
+  }
+
+  function nextPhase() {
+    phaseIndex = (phaseIndex + 1) % phases.length;
+    applyPhase();
+  }
+
+  function startPlayback() {
+    stopPlayback();
+    isPlaying = true;
+    playPauseBtn.textContent = "Pause";
+    timer = setInterval(nextPhase, 1300);
+  }
+
+  playPauseBtn.addEventListener("click", () => {
+    if (isPlaying) {
+      stopPlayback();
+      return;
+    }
+    startPlayback();
+  });
+
+  stepBtn.addEventListener("click", () => {
+    stopPlayback();
+    nextPhase();
+  });
+
+  resetBtn.addEventListener("click", () => {
+    stopPlayback();
+    phaseIndex = 0;
+    applyPhase();
+  });
+
+  phaseList.querySelectorAll("li[data-phase]").forEach((item) => {
+    item.addEventListener("click", () => {
+      stopPlayback();
+      const idx = phases.findIndex((phase) => phase.id === item.dataset.phase);
+      if (idx >= 0) {
+        phaseIndex = idx;
+        applyPhase();
+      }
+    });
+  });
+
+  applyPhase();
+}
+
 function initRevealOnScroll() {
   const cards = document.querySelectorAll(".card, .hero, .footer");
   const observer = new IntersectionObserver(
@@ -1823,4 +1956,5 @@ setupNeurones();
 setupSaltatoryConduction();
 setupCompareTask();
 setupNerveImpulseMeasurement();
+setupActionPotentials();
 initRevealOnScroll();
