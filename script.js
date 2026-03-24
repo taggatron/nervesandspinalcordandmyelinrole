@@ -1366,10 +1366,12 @@ function setupNerveImpulseMeasurement() {
   const stimulateBtn = document.getElementById("hhStimulate");
   const wireA = document.getElementById("hhWireA");
   const wireB = document.getElementById("hhWireB");
+  const wireBankA = document.getElementById("hhWireBankA");
+  const wireBankB = document.getElementById("hhWireBankB");
   const jackA = document.getElementById("hhJackA");
   const jackB = document.getElementById("hhJackB");
 
-  if (!measureGrid || !bank || !insideDrop || !outsideDrop || !electrodes.length || !trace || !readout || !feedback || !stimulateBtn || !wireA || !wireB || !jackA || !jackB) {
+  if (!measureGrid || !bank || !insideDrop || !outsideDrop || !electrodes.length || !trace || !readout || !feedback || !stimulateBtn || !wireA || !wireB || !jackA || !jackB || !wireBankA || !wireBankB) {
     return;
   }
 
@@ -1405,7 +1407,19 @@ function setupNerveImpulseMeasurement() {
     pathEl.setAttribute("d", `M ${from.x.toFixed(2)} ${from.y.toFixed(2)} C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${to.x.toFixed(2)} ${to.y.toFixed(2)}`);
   }
 
+  function bankAnchorInGrid(ratioY) {
+    const bankRect = bank.getBoundingClientRect();
+    return toGridPoint(bankRect.right, bankRect.top + bankRect.height * ratioY);
+  }
+
+  function updateBankConnectionWires() {
+    drawWire(wireBankA, bankAnchorInGrid(0.35), elementCenterInGrid(jackA));
+    drawWire(wireBankB, bankAnchorInGrid(0.72), elementCenterInGrid(jackB));
+  }
+
   function updateWires(pointerById = {}) {
+    updateBankConnectionWires();
+
     ["A", "B"].forEach((id) => {
       const electrode = document.querySelector(`.electrode-chip[data-id="${id}"]`);
       const targetWire = wireMap[id];
