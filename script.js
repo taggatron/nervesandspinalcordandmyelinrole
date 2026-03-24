@@ -1368,10 +1368,13 @@ function setupNerveImpulseMeasurement() {
   const wireB = document.getElementById("hhWireB");
   const wireBankA = document.getElementById("hhWireBankA");
   const wireBankB = document.getElementById("hhWireBankB");
+  const leadA = document.getElementById("hhLeadA");
+  const leadB = document.getElementById("hhLeadB");
+  const wireLayer = document.getElementById("hhWireLayer");
   const jackA = document.getElementById("hhJackA");
   const jackB = document.getElementById("hhJackB");
 
-  if (!measureGrid || !bank || !insideDrop || !outsideDrop || !electrodes.length || !trace || !readout || !feedback || !stimulateBtn || !wireA || !wireB || !jackA || !jackB || !wireBankA || !wireBankB) {
+  if (!measureGrid || !bank || !insideDrop || !outsideDrop || !electrodes.length || !trace || !readout || !feedback || !stimulateBtn || !wireA || !wireB || !jackA || !jackB || !wireBankA || !wireBankB || !leadA || !leadB || !wireLayer) {
     return;
   }
 
@@ -1386,6 +1389,11 @@ function setupNerveImpulseMeasurement() {
     B: { path: wireB, jack: jackB }
   };
 
+  const leadMap = {
+    A: leadA,
+    B: leadB
+  };
+
   function toGridPoint(clientX, clientY) {
     const gridRect = measureGrid.getBoundingClientRect();
     return {
@@ -1394,22 +1402,39 @@ function setupNerveImpulseMeasurement() {
     };
   }
 
+  function syncWireViewport() {
+    const gridRect = measureGrid.getBoundingClientRect();
+    wireLayer.setAttribute("viewBox", `0 0 ${gridRect.width.toFixed(2)} ${gridRect.height.toFixed(2)}`);
+  }
+
   function elementCenterInGrid(el) {
     const rect = el.getBoundingClientRect();
     return toGridPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
   }
 
   function drawWire(pathEl, from, to) {
-    const c1x = from.x + Math.max(55, (to.x - from.x) * 0.32);
+    const dx = to.x - from.x;
+    const dir = dx >= 0 ? 1 : -1;
+    const bend = Math.max(65, Math.abs(dx) * 0.42);
+    const c1x = from.x + dir * bend;
     const c1y = from.y;
-    const c2x = to.x - Math.max(85, (to.x - from.x) * 0.4);
+    const c2x = to.x - dir * bend;
     const c2y = to.y;
     pathEl.setAttribute("d", `M ${from.x.toFixed(2)} ${from.y.toFixed(2)} C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${to.x.toFixed(2)} ${to.y.toFixed(2)}`);
   }
 
   function bankAnchorInGrid(ratioY) {
     const bankRect = bank.getBoundingClientRect();
-    return toGridPoint(bankRect.right, bankRect.top + bankRect.height * ratioY);
+    const narrowScreen = window.matchMedia("(max-width: 900px)").matches;
+    return toGridPoint(
+      narrowScreen ? bankRect.left : bankRect.right,
+      bankRect.top + bankRect.height * ratioY
+    );
+  }
+
+  function electrodeBackInGrid(el) {
+    const rect = el.getBoundingClientRect();
+    return toGridPoint(rect.left, rect.top + rect.height / 2);
   }
 
   function updateBankConnectionWires() {
@@ -1418,16 +1443,26 @@ function setupNerveImpulseMeasurement() {
   }
 
   function updateWires(pointerById = {}) {
+    syncWireViewport();
     updateBankConnectionWires();
 
     ["A", "B"].forEach((id) => {
       const electrode = document.querySelector(`.electrode-chip[data-id="${id}"]`);
       const targetWire = wireMap[id];
-      if (!electrode || !targetWire) return;
+      const leadWire = leadMap[id];
+      if (!electrode || !targetWire || !leadWire) return;
 
-      const start = pointerById[id] || elementCenterInGrid(electrode);
-      const end = elementCenterInGrid(targetWire.jack);
-      drawWire(targetWire.path, start, end);
+      const bankAnchor = bankAnchorInGrid(id === "A" ? 0.35 : 0.72);
+      if (bank.contains(electrode) && !pointerById[id]) {
+        leadWire.setAttribute("d", "");
+      } else {
+        const leadStart = pointerById[id] || electrodeBackInGrid(electrode);
+        drawWire(leadWire, leadStart, bankAnchor);
+      }
+
+      // Direct electrode-to-jack paths are intentionally hidden so each electrode
+      // reads as one continuous cable via the bank on all layouts.
+      targetWire.path.setAttribute("d", "");
     });
   }
 
