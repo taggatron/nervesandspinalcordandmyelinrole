@@ -197,6 +197,191 @@ h4 {
   gap: 10px;
 }
 
+.arc-instruction {
+  margin: 6px 0 8px;
+  color: var(--muted);
+  font-size: 0.94rem;
+}
+
+.reflex-arc-stage {
+  position: relative;
+  border: 1px dashed rgba(40, 77, 145, 0.38);
+  border-radius: 12px;
+  background: rgba(245, 251, 255, 0.85);
+  overflow: hidden;
+}
+
+#reflexArcSvg,
+#reflexArcSvgHost {
+  width: 100%;
+  display: block;
+}
+
+#reflexArcSvgHost {
+  aspect-ratio: 760 / 420;
+}
+
+.arc-bg {
+  fill: #f8fbff;
+}
+
+.arc-limb {
+  fill: #ffd8bd;
+  stroke: #d9936d;
+  stroke-width: 2;
+}
+
+.arc-muscle {
+  fill: #ff8668;
+  stroke: #d15a3f;
+  stroke-width: 2;
+}
+
+.arc-fibers {
+  fill: none;
+  stroke: rgba(162, 58, 45, 0.45);
+  stroke-width: 2;
+  stroke-linecap: round;
+}
+
+.arc-bone {
+  stroke: #f6f9ff;
+  stroke-width: 9;
+  stroke-linecap: round;
+}
+
+.arc-bone.femur {
+  stroke-width: 11;
+}
+
+.arc-foot {
+  fill: none;
+  stroke: #f6f9ff;
+  stroke-width: 8;
+  stroke-linecap: round;
+}
+
+.arc-patella {
+  fill: #fff0c8;
+  stroke: #d89b2f;
+  stroke-width: 2;
+}
+
+.arc-tendon {
+  fill: none;
+  stroke: #f4e6b2;
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.arc-tuberosity {
+  fill: #f6f9ff;
+  stroke: #8ca1cb;
+  stroke-width: 1.4;
+}
+
+.arc-cord {
+  fill: #fbe3f1;
+  stroke: #c4709a;
+  stroke-width: 2;
+}
+
+.arc-grey {
+  fill: #f5bfdc;
+  stroke: #bb628f;
+  stroke-width: 1.4;
+}
+
+.arc-path {
+  fill: none;
+  stroke-width: 6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.arc-path.sensory {
+  stroke: #2f75ff;
+}
+
+.arc-path.relay {
+  stroke: #aa4ec7;
+  stroke-width: 5;
+}
+
+.arc-path.motor {
+  stroke: #00a891;
+}
+
+.arc-arrow {
+  fill: #1d5db9;
+}
+
+.arc-caption {
+  fill: #26456f;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.arc-caption.small {
+  font-size: 13px;
+}
+
+.arc-title {
+  fill: #1f3660;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.arc-hammer-handle {
+  fill: #85633f;
+}
+
+.arc-hammer-head {
+  fill: #c7d2e7;
+  stroke: #7a8cab;
+  stroke-width: 1.6;
+}
+
+#reflexImpulseDot {
+  fill: #ffd24a;
+  stroke: #ffffff;
+  stroke-width: 2;
+  opacity: 0;
+  filter: drop-shadow(0 0 9px rgba(255, 190, 60, 0.95));
+}
+
+.arc-zone {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  min-height: 36px;
+  border-radius: 999px;
+  border: 1px dashed rgba(47, 117, 255, 0.52);
+  background: rgba(255, 255, 255, 0.78);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2px;
+}
+
+.arc-zone.filled {
+  border-style: solid;
+  border-color: rgba(0, 184, 169, 0.7);
+  background: #ffffff;
+}
+
+.arc-zone.active {
+  border-color: var(--accent-1);
+  box-shadow: inset 0 0 0 2px rgba(0, 184, 169, 0.22);
+}
+
+.arc-zone .chip {
+  white-space: nowrap;
+  transform: scale(0.94);
+}
+
 .drop-slot,
 .drop-list {
   min-height: 54px;
@@ -558,5 +743,13 @@ h4 {
   .slot-label {
     min-width: 130px;
     font-size: 0.84rem;
+  }
+
+  .arc-zone {
+    width: 32px;
+    height: 32px;
+    min-width: 32px;
+    min-height: 32px;
+    padding: 1px;
   }
 }

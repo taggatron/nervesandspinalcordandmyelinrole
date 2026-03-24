@@ -1,21 +1,11 @@
 const reflexItems = [
-  { id: "stimulus", text: "Stimulus (pain/heat)", target: "1" },
-  { id: "receptor", text: "Receptor in skin", target: "2" },
-  { id: "sensory", text: "Sensory neurone", target: "3" },
-  { id: "relay", text: "Relay neurone in spinal cord", target: "4" },
-  { id: "motor", text: "Motor neurone", target: "5" },
-  { id: "effector", text: "Effector (muscle)", target: "6" },
-  { id: "response", text: "Response (withdrawal)", target: "7" }
-];
-
-const reflexTargets = [
-  { key: "1", label: "1. First event" },
-  { key: "2", label: "2. Detection" },
-  { key: "3", label: "3. Incoming pathway" },
-  { key: "4", label: "4. Synapse/processing" },
-  { key: "5", label: "5. Outgoing pathway" },
-  { key: "6", label: "6. Activated tissue" },
-  { key: "7", label: "7. Final effect" }
+  { id: "stimulus", text: "Stimulus (tap on tendon)", target: "stimulus" },
+  { id: "receptor", text: "Receptor (muscle spindle)", target: "receptor" },
+  { id: "sensory", text: "Sensory neurone", target: "sensory" },
+  { id: "relay", text: "Relay neurone in spinal cord", target: "relay" },
+  { id: "motor", text: "Motor neurone", target: "motor" },
+  { id: "effector", text: "Effector (quadriceps muscle)", target: "effector" },
+  { id: "response", text: "Response (leg kicks)", target: "response" }
 ];
 
 const compareItems = [
@@ -226,65 +216,73 @@ function setDropHandlers(el, onDropItem) {
 
 function createReflexTask() {
   const labels = document.getElementById("reflexLabels");
-  const zones = document.getElementById("reflexZones");
+  const zones = [...document.querySelectorAll(".arc-zone")];
   const feedback = document.getElementById("reflexFeedback");
 
   const targetToItem = new Map();
 
+  function findItemTarget(id) {
+    return [...targetToItem.entries()].find(([, val]) => val === id)?.[0];
+  }
+
+  function setZoneFilledState(targetKey, filled) {
+    const zone = zones.find((z) => z.dataset.target === targetKey);
+    if (!zone) return;
+    zone.classList.toggle("filled", filled);
+  }
+
+  function dropIntoZone(id, dropEl) {
+    if (!id) return;
+
+    const chip = document.querySelector(`.chip[data-id="${id}"]`);
+    if (!chip) return;
+
+    const previousTarget = findItemTarget(id);
+    if (previousTarget) {
+      targetToItem.delete(previousTarget);
+      setZoneFilledState(previousTarget, false);
+    }
+
+    const currentTarget = dropEl.dataset.target;
+    const occupant = targetToItem.get(currentTarget);
+    if (occupant && occupant !== id) {
+      const occupiedChip = document.querySelector(`.chip[data-id="${occupant}"]`);
+      if (occupiedChip) labels.appendChild(occupiedChip);
+    }
+
+    targetToItem.set(currentTarget, id);
+    dropEl.appendChild(chip);
+    setZoneFilledState(currentTarget, true);
+  }
+
+  zones.forEach((zone) => {
+    setDropHandlers(zone, dropIntoZone);
+  });
+
+  setDropHandlers(labels, (id) => {
+    if (!id) return;
+    const chip = document.querySelector(`.chip[data-id="${id}"]`);
+    if (!chip) return;
+    const previousTarget = findItemTarget(id);
+    if (previousTarget) {
+      targetToItem.delete(previousTarget);
+      setZoneFilledState(previousTarget, false);
+    }
+    labels.appendChild(chip);
+  });
+
   function reset() {
     labels.innerHTML = "";
-    zones.innerHTML = "";
     feedback.textContent = "";
     feedback.className = "feedback";
     targetToItem.clear();
 
+    zones.forEach((zone) => {
+      zone.classList.remove("filled");
+      zone.querySelectorAll(".chip").forEach((chip) => chip.remove());
+    });
+
     shuffle(reflexItems).forEach((item) => labels.appendChild(chipTemplate(item)));
-
-    reflexTargets.forEach((target) => {
-      const slot = document.createElement("div");
-      slot.className = "drop-slot";
-      slot.dataset.target = target.key;
-
-      const label = document.createElement("div");
-      label.className = "slot-label";
-      label.textContent = target.label;
-
-      slot.appendChild(label);
-      zones.appendChild(slot);
-
-      setDropHandlers(slot, (id, dropEl) => {
-        if (!id) return;
-
-        const chip = document.querySelector(`.chip[data-id="${id}"]`);
-        if (!chip) return;
-
-        const previousTarget = [...targetToItem.entries()].find(([, val]) => val === id)?.[0];
-        if (previousTarget) {
-          targetToItem.delete(previousTarget);
-        }
-
-        const currentTarget = dropEl.dataset.target;
-        const occupant = targetToItem.get(currentTarget);
-        if (occupant && occupant !== id) {
-          const occupiedChip = document.querySelector(`.chip[data-id="${occupant}"]`);
-          if (occupiedChip) labels.appendChild(occupiedChip);
-        }
-
-        targetToItem.set(currentTarget, id);
-        dropEl.appendChild(chip);
-      });
-    });
-
-    setDropHandlers(labels, (id) => {
-      if (!id) return;
-      const chip = document.querySelector(`.chip[data-id="${id}"]`);
-      if (!chip) return;
-      const previousTarget = [...targetToItem.entries()].find(([, val]) => val === id)?.[0];
-      if (previousTarget) {
-        targetToItem.delete(previousTarget);
-      }
-      labels.appendChild(chip);
-    });
   }
 
   document.getElementById("checkReflex").addEventListener("click", () => {
@@ -315,6 +313,128 @@ function createReflexTask() {
 
   document.getElementById("resetReflex").addEventListener("click", reset);
   reset();
+}
+
+async function ensureReflexSvgLoaded() {
+  const host = document.getElementById("reflexArcSvgHost");
+  if (!host) return null;
+
+  let svg = host.querySelector("#reflexArcSvg");
+  if (svg) return svg;
+
+  try {
+    const response = await fetch("reflex-arc.svg", { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(`Unable to load reflex-arc.svg (${response.status})`);
+    }
+
+    const markup = await response.text();
+    host.innerHTML = markup;
+    svg = host.querySelector("#reflexArcSvg");
+    return svg;
+  } catch {
+    host.innerHTML = "<p class=\"structure-text\">Reflex diagram could not be loaded.</p>";
+    return null;
+  }
+}
+
+async function setupReflexArcAnimation() {
+  const playBtn = document.getElementById("playReflexDemo");
+
+  if (!playBtn) {
+    return;
+  }
+
+  const svg = await ensureReflexSvgLoaded();
+  if (!svg) {
+    return;
+  }
+
+  const hammer = svg.querySelector("#reflexHammer");
+  const impulseDot = svg.querySelector("#reflexImpulseDot");
+  const sensoryPath = svg.querySelector("#sensoryImpulsePath");
+  const relayPath = svg.querySelector("#relayImpulsePath");
+  const motorPath = svg.querySelector("#motorImpulsePath");
+
+  if (!hammer || !impulseDot || !sensoryPath || !relayPath || !motorPath) {
+    return;
+  }
+
+  let isAnimating = false;
+
+  function moveDotToPathStart(path) {
+    const start = path.getPointAtLength(0);
+    impulseDot.setAttribute("cx", String(start.x));
+    impulseDot.setAttribute("cy", String(start.y));
+  }
+
+  function animateAlongPath(path, duration) {
+    return new Promise((resolve) => {
+      const totalLength = path.getTotalLength();
+      const startTime = performance.now();
+
+      function tick(now) {
+        const elapsed = now - startTime;
+        const progress = Math.min(1, elapsed / duration);
+        const point = path.getPointAtLength(totalLength * progress);
+        impulseDot.setAttribute("cx", String(point.x));
+        impulseDot.setAttribute("cy", String(point.y));
+
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          resolve();
+        }
+      }
+
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function strikeHammer() {
+    hammer.animate(
+      [
+        { transform: "rotate(0deg)", transformOrigin: "653px 259px" },
+        { transform: "rotate(-34deg)", transformOrigin: "653px 259px", offset: 0.45 },
+        { transform: "rotate(12deg)", transformOrigin: "653px 259px", offset: 0.72 },
+        { transform: "rotate(0deg)", transformOrigin: "653px 259px" }
+      ],
+      { duration: 560, easing: "ease-in-out" }
+    );
+  }
+
+  async function playReflexDemo() {
+    if (isAnimating) return;
+    isAnimating = true;
+    playBtn.textContent = "Animating...";
+    playBtn.disabled = true;
+
+    strikeHammer();
+
+    impulseDot.style.opacity = "1";
+    moveDotToPathStart(sensoryPath);
+    await animateAlongPath(sensoryPath, 900);
+    await animateAlongPath(relayPath, 360);
+    await animateAlongPath(motorPath, 820);
+
+    impulseDot.animate(
+      [
+        { transform: "scale(1)", opacity: 1 },
+        { transform: "scale(1.35)", opacity: 0.75 },
+        { transform: "scale(1)", opacity: 0 }
+      ],
+      { duration: 420, easing: "ease-out" }
+    );
+
+    setTimeout(() => {
+      impulseDot.style.opacity = "0";
+      playBtn.disabled = false;
+      playBtn.textContent = "Play Knee-Jerk Animation";
+      isAnimating = false;
+    }, 380);
+  }
+
+  playBtn.addEventListener("click", playReflexDemo);
 }
 
 function setupMicroscopy() {
@@ -684,6 +804,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 createReflexTask();
+setupReflexArcAnimation();
 setupMicroscopy();
 setupNeurones();
 setupSaltatoryConduction();

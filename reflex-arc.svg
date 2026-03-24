@@ -1,0 +1,43 @@
+<svg id="reflexArcSvg" viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" aria-label="Simplified knee-jerk reflex arc diagram">
+  <rect x="0" y="0" width="760" height="420" class="arc-bg" />
+
+  <path d="M504,92 C582,86 640,128 648,198 C652,236 636,272 606,284 C561,302 513,270 501,225 C487,174 484,116 504,92 Z" class="arc-limb" />
+  <path d="M515,118 C567,97 617,122 631,167 C640,197 624,225 593,235 C561,244 531,230 519,201 C507,174 497,136 515,118 Z" class="arc-muscle" />
+  <path d="M522,150 C548,136 575,139 594,160" class="arc-fibers" />
+  <path d="M528,176 C554,163 581,167 601,188" class="arc-fibers" />
+  <path d="M536,203 C560,192 585,197 602,214" class="arc-fibers" />
+
+  <line x1="560" y1="104" x2="589" y2="248" class="arc-bone femur" />
+  <circle cx="590" cy="257" r="11" class="arc-patella" />
+
+  <g id="lowerLegGroup">
+    <path d="M579,268 C568,312 555,350 547,390" class="arc-bone tibia" />
+    <path d="M602,274 C610,314 621,348 630,387" class="arc-bone fibula" />
+    <path d="M544,389 C572,396 601,396 628,388" class="arc-foot" />
+    <path d="M590,268 C586,282 585,294 584,307" class="arc-tendon" />
+    <circle cx="584" cy="307" r="6" class="arc-tuberosity" />
+  </g>
+
+  <g id="reflexHammer" class="arc-hammer">
+    <rect x="646" y="232" width="14" height="54" rx="6" class="arc-hammer-handle" transform="rotate(20 653 259)" />
+    <rect x="629" y="220" width="36" height="18" rx="7" class="arc-hammer-head" transform="rotate(20 647 229)" />
+  </g>
+
+  <rect x="260" y="126" width="104" height="154" rx="50" class="arc-cord" />
+  <path d="M280,200 C300,154 325,154 344,200 C325,244 300,244 280,200 Z" class="arc-grey" />
+
+  <path id="sensoryImpulsePath" d="M584,307 C544,288 486,252 422,222 C399,212 382,207 364,208" class="arc-path sensory" />
+  <path id="relayImpulsePath" d="M334,200 C318,198 301,198 287,201" class="arc-path relay" />
+  <path id="motorImpulsePath" d="M364,208 C426,190 486,166 542,151 C565,145 580,143 595,146" class="arc-path motor" />
+
+  <circle id="reflexImpulseDot" cx="584" cy="307" r="6" />
+
+  <polygon points="420,212 405,206 407,220" class="arc-arrow" />
+  <polygon points="476,198 463,190 463,205" class="arc-arrow" />
+
+  <text x="566" y="92" class="arc-caption">Quadriceps</text>
+  <text x="608" y="271" class="arc-caption small">Patellar tendon</text>
+  <text x="616" y="331" class="arc-caption small">Tibia</text>
+  <text x="250" y="102" class="arc-caption">Spinal Cord</text>
+  <text x="36" y="34" class="arc-title">Patellar (Knee-Jerk) Reflex</text>
+</svg>

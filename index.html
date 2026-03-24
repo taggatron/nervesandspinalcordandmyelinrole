@@ -37,13 +37,25 @@
         </div>
 
         <div class="dropzone-wrap" aria-label="Reflex arc sequence">
-          <h3>Pathway Sequence</h3>
-          <div id="reflexZones" class="sequence"></div>
+          <h3>Knee-Jerk Reflex Arc</h3>
+          <p class="arc-instruction">Drag each label to the matching location on the diagram.</p>
+          <div class="reflex-arc-stage" id="reflexArcStage">
+            <div id="reflexArcSvgHost" aria-label="Simplified knee-jerk reflex arc diagram"></div>
+
+            <div class="arc-zone" data-target="stimulus" style="left: 86%; top: 63%;"></div>
+            <div class="arc-zone" data-target="receptor" style="left: 78%; top: 49%;"></div>
+            <div class="arc-zone" data-target="sensory" style="left: 58%; top: 57%;"></div>
+            <div class="arc-zone" data-target="relay" style="left: 40%; top: 48%;"></div>
+            <div class="arc-zone" data-target="motor" style="left: 57%; top: 38%;"></div>
+            <div class="arc-zone" data-target="effector" style="left: 74%; top: 30%;"></div>
+            <div class="arc-zone" data-target="response" style="left: 89%; top: 27%;"></div>
+          </div>
         </div>
       </div>
 
       <div class="button-row">
         <button id="checkReflex" class="btn">Check Answers</button>
+        <button id="playReflexDemo" class="btn btn-ghost">Play Knee-Jerk Animation</button>
         <button id="resetReflex" class="btn btn-ghost">Reset</button>
       </div>
       <p id="reflexFeedback" class="feedback" aria-live="polite"></p>
