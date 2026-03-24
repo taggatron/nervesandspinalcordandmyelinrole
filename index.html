@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reflex Arc and Spinal Cord Interactive Lab</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orb orb-a"></div>
+  <div class="bg-orb orb-b"></div>
+  <div class="bg-grid"></div>
+
+  <header class="hero reveal">
+    <p class="eyebrow">Nervous System Interactive Lab</p>
+    <h1>Reflex Arc, Spinal Cord, and Neurones</h1>
+    <p class="hero-copy">
+      Learn by doing: drag labels, explore an animated spinal cord micrograph, and compare neurones with interactive sorting.
+    </p>
+    <a class="hero-cta" href="#task1">Start Learning</a>
+  </header>
+
+  <main class="main-layout">
+    <section id="task1" class="card reveal">
+      <div class="card-head">
+        <h2>1. Reflex Arc Drag and Drop</h2>
+        <p>Match each label to the correct step in the pathway.</p>
+      </div>
+
+      <div class="reflex-grid">
+        <div class="label-bank" aria-label="Reflex arc labels">
+          <h3>Labels</h3>
+          <div id="reflexLabels" class="chips" data-bank="reflex"></div>
+        </div>
+
+        <div class="dropzone-wrap" aria-label="Reflex arc sequence">
+          <h3>Pathway Sequence</h3>
+          <div id="reflexZones" class="sequence"></div>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="checkReflex" class="btn">Check Answers</button>
+        <button id="resetReflex" class="btn btn-ghost">Reset</button>
+      </div>
+      <p id="reflexFeedback" class="feedback" aria-live="polite"></p>
+    </section>
+
+    <section id="task2" class="card reveal">
+      <div class="card-head">
+        <h2>2. Animated Spinal Cord Structure</h2>
+        <p>
+          Use the controls to highlight structures on a microscopic transverse section.
+        </p>
+      </div>
+
+      <div class="microscopy-grid">
+        <div class="microscopy-stage" id="microscopyStage">
+          <img src="spinalcord_microscopy.webp" alt="Microscopic transverse section of spinal cord" id="microscopyImage" />
+          <div class="hotspot" data-target="grey" style="left: 52%; top: 51%;">Grey Matter</div>
+          <div class="hotspot" data-target="white" style="left: 76%; top: 23%;">White Matter</div>
+          <div class="hotspot" data-target="central" style="left: 49%; top: 57%;">Central Canal</div>
+          <div class="hotspot" data-target="dorsal" style="left: 42%; top: 20%;">Dorsal Horn</div>
+          <div class="hotspot" data-target="ventral" style="left: 46%; top: 79%;">Ventral Horn</div>
+          <div id="scanLine" class="scan-line"></div>
+        </div>
+
+        <div class="structure-panel">
+          <h3>Structure Notes</h3>
+          <p id="structureTitle" class="structure-title">Choose a structure to begin</p>
+          <p id="structureText" class="structure-text">
+            Click any label around the image to see an explanation and visual highlight.
+          </p>
+          <div id="structureLegend" class="legend"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="task3" class="card reveal">
+      <div class="card-head">
+        <h2>3. Interactive Neurone Diagrams</h2>
+        <p>Hover or tap each highlighted part to compare motor, sensory, and relay neurones.</p>
+      </div>
+
+      <div class="neurone-tabs" role="tablist" aria-label="Neurone type tabs">
+        <button class="tab-btn active" data-neurone="motor" role="tab" aria-selected="true">Motor</button>
+        <button class="tab-btn" data-neurone="sensory" role="tab" aria-selected="false">Sensory</button>
+        <button class="tab-btn" data-neurone="relay" role="tab" aria-selected="false">Relay</button>
+      </div>
+
+      <div class="neurone-stage">
+        <svg id="neuroneSvg" viewBox="0 0 900 360" aria-label="Neurone diagram"></svg>
+        <div class="neurone-info">
+          <h3 id="neuroneName">Motor Neurone</h3>
+          <p id="neuroneDesc">Select labels to explore neurone structure and function.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="task4" class="card reveal">
+      <div class="card-head">
+        <h2>4. Zoomed Saltatory Conduction Animation</h2>
+        <p>Run an impulse along a myelinated axon and observe how it jumps node-to-node.</p>
+      </div>
+
+      <div class="saltatory-grid">
+        <div class="saltatory-stage" aria-label="Saltatory conduction model">
+          <svg id="saltatorySvg" viewBox="0 0 900 240" aria-label="Saltatory conduction zoomed diagram">
+            <line x1="70" y1="120" x2="840" y2="120" class="salt-axon" />
+
+            <rect x="105" y="94" width="86" height="52" rx="22" class="salt-myelin" />
+            <rect x="215" y="94" width="86" height="52" rx="22" class="salt-myelin" />
+            <rect x="325" y="94" width="86" height="52" rx="22" class="salt-myelin" />
+            <rect x="435" y="94" width="86" height="52" rx="22" class="salt-myelin" />
+            <rect x="545" y="94" width="86" height="52" rx="22" class="salt-myelin" />
+            <rect x="655" y="94" width="86" height="52" rx="22" class="salt-myelin" />
+
+            <line x1="80" y1="120" x2="190" y2="120" class="salt-jump" data-jump="1" />
+            <line x1="190" y1="120" x2="300" y2="120" class="salt-jump" data-jump="2" />
+            <line x1="300" y1="120" x2="410" y2="120" class="salt-jump" data-jump="3" />
+            <line x1="410" y1="120" x2="520" y2="120" class="salt-jump" data-jump="4" />
+            <line x1="520" y1="120" x2="630" y2="120" class="salt-jump" data-jump="5" />
+            <line x1="630" y1="120" x2="740" y2="120" class="salt-jump" data-jump="6" />
+            <line x1="740" y1="120" x2="830" y2="120" class="salt-jump" data-jump="7" />
+
+            <circle class="salt-node" data-node="0" cx="80" cy="120" r="11" />
+            <circle class="salt-node" data-node="1" cx="190" cy="120" r="11" />
+            <circle class="salt-node" data-node="2" cx="300" cy="120" r="11" />
+            <circle class="salt-node" data-node="3" cx="410" cy="120" r="11" />
+            <circle class="salt-node" data-node="4" cx="520" cy="120" r="11" />
+            <circle class="salt-node" data-node="5" cx="630" cy="120" r="11" />
+            <circle class="salt-node" data-node="6" cx="740" cy="120" r="11" />
+            <circle class="salt-node" data-node="7" cx="830" cy="120" r="11" />
+
+            <circle id="saltSpark" cx="80" cy="120" r="8" />
+
+            <text x="85" y="171" class="salt-label">Node of Ranvier</text>
+            <text x="290" y="76" class="salt-label">Myelin sheath</text>
+            <text x="590" y="171" class="salt-label">Impulse "jump" pathway</text>
+          </svg>
+        </div>
+
+        <div class="saltatory-panel">
+          <h3>Interactive Controls</h3>
+          <p id="saltStatus" class="salt-status">Impulse ready at Node 1 of 8.</p>
+          <div class="button-row">
+            <button id="saltPlayPause" class="btn">Play</button>
+            <button id="saltStep" class="btn btn-ghost">Step</button>
+            <button id="saltReset" class="btn btn-ghost">Reset</button>
+          </div>
+
+          <label class="salt-speed-wrap" for="saltSpeed">
+            Speed
+            <input id="saltSpeed" type="range" min="300" max="1400" step="50" value="850" />
+            <span id="saltSpeedValue">850 ms</span>
+          </label>
+
+          <p class="structure-text">
+            Saltatory conduction allows a signal to travel faster because depolarization is regenerated mainly at nodes of Ranvier, not continuously along every part of the membrane.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <section id="task5" class="card reveal">
+      <div class="card-head">
+        <h2>5. Motor vs Sensory Comparison Sort</h2>
+        <p>Drag each statement to Motor, Sensory, or Both.</p>
+      </div>
+
+      <div class="sort-grid">
+        <div>
+          <h3>Statements</h3>
+          <div id="compareBank" class="chips" data-bank="compare"></div>
+        </div>
+
+        <div>
+          <h3>Categories</h3>
+          <div class="category-grid">
+            <div class="category" data-category="motor">
+              <h4>Motor</h4>
+              <div class="drop-list" id="motorDrop"></div>
+            </div>
+            <div class="category" data-category="sensory">
+              <h4>Sensory</h4>
+              <div class="drop-list" id="sensoryDrop"></div>
+            </div>
+            <div class="category" data-category="both">
+              <h4>Both</h4>
+              <div class="drop-list" id="bothDrop"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="checkCompare" class="btn">Check Sort</button>
+        <button id="resetCompare" class="btn btn-ghost">Reset</button>
+      </div>
+      <p id="compareFeedback" class="feedback" aria-live="polite"></p>
+    </section>
+  </main>
+
+  <footer class="footer reveal">
+    <p>Built for active learning in neurobiology.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
