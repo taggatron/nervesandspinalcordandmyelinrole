@@ -757,6 +757,56 @@ h4 {
   fill: #0f9d58;
 }
 
+.salt-ion-dot {
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.salt-ion-dot.show {
+  opacity: 0.45;
+}
+
+.salt-ion-dot.phase-active {
+  opacity: 0.95;
+}
+
+.salt-ion-dot.na {
+  fill: #2f75ff;
+}
+
+.salt-ion-dot.k {
+  fill: #0f9d58;
+}
+
+.salt-charge-label {
+  font-size: 8px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.salt-charge-label.show {
+  opacity: 0.95;
+}
+
+.salt-charge-label.positive {
+  fill: #2f75ff;
+}
+
+.salt-charge-label.negative {
+  fill: #0f9d58;
+}
+
+.salt-charge-label.mixed {
+  fill: #b66e18;
+}
+
+.salt-charge-label.neutral {
+  fill: #5f7291;
+}
+
 .salt-node.ion-na {
   fill: #d9ecff;
   stroke: #2f75ff;

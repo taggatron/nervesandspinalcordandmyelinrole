@@ -983,6 +983,8 @@ function setupSaltatoryConduction() {
   let intervalMs = Number(speed.value);
   let ionModeEnabled = false;
   let ionPhaseStep = 0;
+  let ionAnimFrame = null;
+  let ionDrift = 0;
 
   const svgNs = "http://www.w3.org/2000/svg";
   const ionNaMarker = document.createElementNS(svgNs, "text");
@@ -993,8 +995,133 @@ function setupSaltatoryConduction() {
   ionKMarker.setAttribute("class", "salt-ion-marker k");
   ionKMarker.textContent = "K+ out";
 
+  const ionDotsNa = [];
+  const ionDotsK = [];
+  const chargeLabels = [];
+
+  nodes.forEach((node, index) => {
+    const cx = Number(node.getAttribute("cx"));
+    const cy = Number(node.getAttribute("cy"));
+
+    const charge = document.createElementNS(svgNs, "text");
+    charge.setAttribute("class", "salt-charge-label neutral");
+    charge.setAttribute("x", String(cx - 4));
+    charge.setAttribute("y", String(cy - 17));
+    charge.textContent = "0";
+    charge.dataset.nodeIndex = String(index);
+    chargeLabels.push(charge);
+    saltSvg.appendChild(charge);
+  });
+
+  for (let i = 0; i < 12; i += 1) {
+    const na = document.createElementNS(svgNs, "circle");
+    na.setAttribute("class", "salt-ion-dot na");
+    na.setAttribute("r", "1.35");
+    na.dataset.dotIndex = String(i);
+    ionDotsNa.push(na);
+    saltSvg.appendChild(na);
+
+    const k = document.createElementNS(svgNs, "circle");
+    k.setAttribute("class", "salt-ion-dot k");
+    k.setAttribute("r", "1.35");
+    k.dataset.dotIndex = String(i);
+    ionDotsK.push(k);
+    saltSvg.appendChild(k);
+  }
+
   saltSvg.appendChild(ionNaMarker);
   saltSvg.appendChild(ionKMarker);
+
+  function setIonFlowVisible(isVisible) {
+    [...ionDotsNa, ...ionDotsK, ...chargeLabels].forEach((el) => {
+      el.classList.toggle("show", isVisible);
+    });
+  }
+
+  function renderIonParticles() {
+    const phase = ionPhases[ionPhaseStep % ionPhases.length];
+    const segmentCount = jumps.length;
+
+    ionDotsNa.forEach((dot, idx) => {
+      const segmentIndex = (currentNode + idx) % segmentCount;
+      const jump = jumps[segmentIndex];
+      const x1 = Number(jump.getAttribute("x1"));
+      const x2 = Number(jump.getAttribute("x2"));
+      const y = Number(jump.getAttribute("y1"));
+      const t = (idx / ionDotsNa.length + ionDrift) % 1;
+      const x = x1 + (x2 - x1) * t;
+      const yOffset = idx % 2 === 0 ? -1.6 : 1.6;
+
+      dot.setAttribute("cx", String(x));
+      dot.setAttribute("cy", String(y + yOffset));
+      dot.classList.toggle("phase-active", phase.id === "na");
+    });
+
+    ionDotsK.forEach((dot, idx) => {
+      const segmentIndex = (currentNode + idx + 1) % segmentCount;
+      const jump = jumps[segmentIndex];
+      const x1 = Number(jump.getAttribute("x1"));
+      const x2 = Number(jump.getAttribute("x2"));
+      const y = Number(jump.getAttribute("y1"));
+      const t = (idx / ionDotsK.length + ionDrift * 0.9) % 1;
+      const x = x2 - (x2 - x1) * t;
+      const aroundOffset = idx % 2 === 0 ? -17 : 17;
+
+      dot.setAttribute("cx", String(x));
+      dot.setAttribute("cy", String(y + aroundOffset));
+      dot.classList.toggle("phase-active", phase.id === "k");
+    });
+  }
+
+  function renderNodeCharges() {
+    const phase = ionPhases[ionPhaseStep % ionPhases.length];
+
+    chargeLabels.forEach((label, idx) => {
+      label.classList.remove("positive", "negative", "neutral", "mixed");
+
+      if (idx === currentNode) {
+        if (phase.id === "na") {
+          label.textContent = "+";
+          label.classList.add("positive");
+        } else if (phase.id === "k") {
+          label.textContent = "±";
+          label.classList.add("mixed");
+        } else {
+          label.textContent = "-";
+          label.classList.add("negative");
+        }
+        return;
+      }
+
+      if (idx < currentNode) {
+        label.textContent = "-";
+        label.classList.add("negative");
+        return;
+      }
+
+      label.textContent = "0";
+      label.classList.add("neutral");
+    });
+  }
+
+  function stopIonAnimation() {
+    if (ionAnimFrame) {
+      cancelAnimationFrame(ionAnimFrame);
+      ionAnimFrame = null;
+    }
+  }
+
+  function runIonAnimation() {
+    stopIonAnimation();
+
+    const tick = () => {
+      ionDrift = (ionDrift + Math.max(0.005, 850 / (intervalMs * 180))) % 1;
+      renderIonParticles();
+      ionAnimFrame = requestAnimationFrame(tick);
+    };
+
+    ionAnimFrame = requestAnimationFrame(tick);
+  }
 
   function updateStatus() {
     status.textContent = `Impulse at Node ${currentNode + 1} of ${nodes.length}.`;
@@ -1025,6 +1152,8 @@ function setupSaltatoryConduction() {
     if (ionPanel.hidden) {
       ionNaMarker.classList.remove("show");
       ionKMarker.classList.remove("show");
+      setIonFlowVisible(false);
+      stopIonAnimation();
       return;
     }
 
@@ -1032,6 +1161,8 @@ function setupSaltatoryConduction() {
       ionStatus.textContent = "Ion mode is off. Enable it to see Na+ and K+ behavior at the active node.";
       ionNaMarker.classList.remove("show");
       ionKMarker.classList.remove("show");
+      setIonFlowVisible(false);
+      stopIonAnimation();
       return;
     }
 
@@ -1051,6 +1182,7 @@ function setupSaltatoryConduction() {
 
     ionNaMarker.classList.toggle("show", phase.id === "na");
     ionKMarker.classList.toggle("show", phase.id === "k");
+    setIonFlowVisible(true);
 
     if (phase.id === "na") {
       active.classList.add("ion-na");
@@ -1059,6 +1191,10 @@ function setupSaltatoryConduction() {
       active.classList.add("ion-k");
       spark.classList.add("ion-k");
     }
+
+    renderNodeCharges();
+    renderIonParticles();
+    runIonAnimation();
 
     ionStatus.textContent = `Node ${currentNode + 1}: ${phase.title} (${phase.ionText}). ${phase.detail}`;
   }
