@@ -222,6 +222,12 @@ function createReflexTask() {
 
   const targetToItem = new Map();
 
+  function clearCorrectHighlights() {
+    document.querySelectorAll(".chip.correct-placed").forEach((chip) => {
+      chip.classList.remove("correct-placed");
+    });
+  }
+
   function findItemTarget(id) {
     return [...targetToItem.entries()].find(([, val]) => val === id)?.[0];
   }
@@ -234,6 +240,8 @@ function createReflexTask() {
 
   function dropIntoZone(id, dropEl) {
     if (!id) return;
+
+    clearCorrectHighlights();
 
     const chip = document.querySelector(`.chip[data-id="${id}"]`);
     if (!chip) return;
@@ -262,6 +270,7 @@ function createReflexTask() {
 
   setDropHandlers(labels, (id) => {
     if (!id) return;
+    clearCorrectHighlights();
     const chip = document.querySelector(`.chip[data-id="${id}"]`);
     if (!chip) return;
     const previousTarget = findItemTarget(id);
@@ -277,6 +286,7 @@ function createReflexTask() {
     feedback.textContent = "";
     feedback.className = "feedback";
     targetToItem.clear();
+    clearCorrectHighlights();
 
     zones.forEach((zone) => {
       zone.classList.remove("filled");
@@ -287,10 +297,16 @@ function createReflexTask() {
   }
 
   document.getElementById("checkReflex").addEventListener("click", () => {
+    clearCorrectHighlights();
+
     let correct = 0;
     reflexItems.forEach((item) => {
       const placedTarget = [...targetToItem.entries()].find(([, val]) => val === item.id)?.[0];
-      if (placedTarget === item.target) correct += 1;
+      if (placedTarget === item.target) {
+        correct += 1;
+        const chip = document.querySelector(`.chip[data-id="${item.id}"]`);
+        chip?.classList.add("correct-placed");
+      }
     });
 
     const total = reflexItems.length;
@@ -683,10 +699,50 @@ function drawNeurone(type) {
   const neuroneName = document.getElementById("neuroneName");
   const neuroneDesc = document.getElementById("neuroneDesc");
   const data = neuroneData[type];
+  const highlightedParts = [];
 
   svg.innerHTML = "";
   neuroneName.textContent = data.name;
   neuroneDesc.textContent = data.desc;
+
+  function registerPart(el, role, partKind) {
+    el.classList.add("neurone-part", `role-${role}`);
+    el.classList.add(partKind === "fill" ? "part-fill" : "part-stroke");
+    return el;
+  }
+
+  function clearHighlights() {
+    highlightedParts.forEach((el) => el.classList.remove("highlighted"));
+    highlightedParts.length = 0;
+  }
+
+  function highlightRoles(roles) {
+    clearHighlights();
+    roles.forEach((role) => {
+      svg.querySelectorAll(`.neurone-part.role-${role}`).forEach((el) => {
+        if (!el.classList.contains("highlighted")) {
+          el.classList.add("highlighted");
+          highlightedParts.push(el);
+        }
+      });
+    });
+  }
+
+  function rolesForNode(node) {
+    const title = node.title.toLowerCase();
+
+    if (title.includes("cell body")) return ["cell-body"];
+    if (title.includes("myelin sheath")) return ["myelin-sheath"];
+    if (title.includes("axon terminals")) return ["axon-terminals"];
+    if (title.includes("synaptic terminal")) return ["axon-terminals"];
+    if (title.includes("dendrites")) return ["dendrites"];
+    if (title.includes("receptor ending")) return ["dendrites"];
+    if (title.includes("axon")) return ["axon"];
+    if (title.includes("peripheral process")) return ["axon"];
+    if (title.includes("central process")) return ["axon"];
+
+    return ["axon"];
+  }
 
   const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
   path.setAttribute("d", data.path);
@@ -697,6 +753,7 @@ function drawNeurone(type) {
   path.setAttribute("stroke-dasharray", "1600");
   path.setAttribute("stroke-dashoffset", "1600");
   path.style.animation = "dash 1.3s ease forwards";
+  registerPart(path, "axon", "stroke");
   svg.appendChild(path);
 
   data.dendrites.forEach((dendritePath) => {
@@ -708,6 +765,7 @@ function drawNeurone(type) {
     dendrite.setAttribute("stroke-linecap", "round");
     dendrite.setAttribute("stroke-linejoin", "round");
     dendrite.setAttribute("opacity", "0.85");
+    registerPart(dendrite, "dendrites", "stroke");
     svg.appendChild(dendrite);
   });
 
@@ -719,6 +777,7 @@ function drawNeurone(type) {
     soma.setAttribute("fill", "#ffe8a2");
     soma.setAttribute("stroke", "#e59d26");
     soma.setAttribute("stroke-width", "2.5");
+    registerPart(soma, "cell-body", "fill");
     svg.appendChild(soma);
 
     const nucleus = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -728,6 +787,7 @@ function drawNeurone(type) {
     nucleus.setAttribute("fill", "#ffd166");
     nucleus.setAttribute("stroke", "#d58a1d");
     nucleus.setAttribute("stroke-width", "1.5");
+    registerPart(nucleus, "cell-body", "fill");
     svg.appendChild(nucleus);
   }
 
@@ -742,6 +802,7 @@ function drawNeurone(type) {
     sheath.setAttribute("stroke", "#da9b2c");
     sheath.setAttribute("stroke-width", "1.5");
     sheath.setAttribute("transform", `rotate(${segment.angle} ${segment.x} ${segment.y})`);
+    registerPart(sheath, "myelin-sheath", "fill");
     svg.appendChild(sheath);
   });
 
@@ -754,6 +815,7 @@ function drawNeurone(type) {
     branch.setAttribute("stroke", "#155ca7");
     branch.setAttribute("stroke-width", "5");
     branch.setAttribute("stroke-linecap", "round");
+    registerPart(branch, "axon-terminals", "stroke");
     svg.appendChild(branch);
 
     const bouton = document.createElementNS("http://www.w3.org/2000/svg", "circle");
@@ -761,6 +823,7 @@ function drawNeurone(type) {
     bouton.setAttribute("cy", terminal.y2);
     bouton.setAttribute("r", "4");
     bouton.setAttribute("fill", "#155ca7");
+    registerPart(bouton, "axon-terminals", "fill");
     svg.appendChild(bouton);
   });
 
@@ -775,14 +838,6 @@ function drawNeurone(type) {
 
   data.nodes.forEach((node) => {
     const g = document.createElementNS("http://www.w3.org/2000/svg", "g");
-
-    const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-    circle.setAttribute("cx", node.x);
-    circle.setAttribute("cy", node.y);
-    circle.setAttribute("r", "12");
-    circle.setAttribute("fill", "#b9efc7");
-    circle.setAttribute("stroke", "#2f9a55");
-    circle.setAttribute("stroke-width", "2");
 
     const labelBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
     labelBox.setAttribute("x", node.x - 58);
@@ -803,14 +858,15 @@ function drawNeurone(type) {
     function activateLabel() {
       [...svg.querySelectorAll(".neurone-label")].forEach((el) => el.classList.remove("active"));
       labelBox.classList.add("active");
+      highlightRoles(rolesForNode(node));
       neuroneDesc.textContent = `${node.title}: ${node.text}`;
     }
 
     labelBox.addEventListener("mouseenter", activateLabel);
     labelBox.addEventListener("click", activateLabel);
+    labelBox.addEventListener("touchstart", activateLabel, { passive: true });
     labelBox.addEventListener("focus", activateLabel);
 
-    g.appendChild(circle);
     g.appendChild(labelBox);
     g.appendChild(labelText);
     svg.appendChild(g);

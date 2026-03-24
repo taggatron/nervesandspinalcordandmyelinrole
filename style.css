@@ -268,6 +268,29 @@ h4 {
   transform: scale(0.94);
 }
 
+.arc-zone .chip.correct-placed {
+  background: #2f9a55;
+  border-color: #227542;
+  color: #f5fff8;
+  box-shadow: 0 0 0 2px rgba(47, 154, 85, 0.22);
+  animation: correct-chip-pulse 1.15s ease-in-out infinite;
+}
+
+@keyframes correct-chip-pulse {
+  0% {
+    transform: translateX(0) scale(0.94);
+  }
+  35% {
+    transform: translateX(2px) scale(1.04);
+  }
+  70% {
+    transform: translateX(-2px) scale(0.92);
+  }
+  100% {
+    transform: translateX(0) scale(0.94);
+  }
+}
+
 .arc-zone .chip[data-id="stimulus"] {
   white-space: normal;
 }
@@ -534,6 +557,24 @@ h4 {
 
 .neurone-label.active {
   fill: #ffe9d7;
+}
+
+.neurone-part {
+  transition: fill 0.2s ease, stroke 0.2s ease, opacity 0.2s ease, filter 0.2s ease;
+}
+
+.neurone-part.highlighted {
+  filter: drop-shadow(0 0 6px rgba(47, 154, 85, 0.6));
+}
+
+.neurone-part.part-stroke.highlighted {
+  stroke: #2f9a55;
+  stroke-opacity: 0.95;
+}
+
+.neurone-part.part-fill.highlighted {
+  fill: rgba(47, 154, 85, 0.3);
+  stroke: #2f9a55;
 }
 
 .neurone-info {
