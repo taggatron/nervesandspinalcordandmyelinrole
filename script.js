@@ -738,7 +738,7 @@ async function setupReflexArcAnimation() {
   function moveHammerHome(fromTx, fromTy) {
     return new Promise((resolve) => {
       const baseTranslate = parseTranslate(hammerBaseTransform);
-      const duration = 260;
+      const duration = 420;
       const start = performance.now();
 
       const tick = (now) => {

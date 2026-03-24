@@ -154,9 +154,9 @@
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="0.91028715"
-     inkscape:cx="504.23649"
-     inkscape:cy="280.13138"
+     inkscape:zoom="0.95381964"
+     inkscape:cx="480.17464"
+     inkscape:cy="334.44478"
      inkscape:window-width="1296"
      inkscape:window-height="905"
      inkscape:window-x="221"
@@ -358,9 +358,10 @@
        sodipodi:nodetypes="csssassac"
        transform="rotate(1.3938917,-56.125277,1409.4989)" />
     <path
-       d="m 579.30122,279.75882 c 8.97001,44.45828 13.55628,84.35773 23.51686,123.91512"
+       d="m 589.41884,265.78311 c -9.67798,43.70824 -1.22608,98.5783 13.39924,137.89083"
        class="arc-bone tibia"
-       id="path6" />
+       id="path6"
+       sodipodi:nodetypes="cc" />
     <path
        d="m 600.79588,278.02079 c 2.68327,41.72873 5.92608,93.0614 11.45578,134.8215"
        class="arc-bone fibula"
@@ -374,40 +375,42 @@
        style="stroke-width:12.4;stroke-dasharray:none"
        sodipodi:nodetypes="cc" />
     <path
-       d="m 569.83322,385.81215 c -8.49915,0.94677 -23.77413,-36.7832 -27.51917,-65.3086 -2.43834,-18.94651 -3.40571,-35.05101 1.73356,-34.18408 5.34308,1.64638 13.96056,19.51385 16.89532,38.52594 2.87722,17.87573 11.52369,54.54205 8.89029,60.96674 z"
+       d="m 602.02868,402.19872 c -8.31161,0.95882 -22.0736,-45.64604 -24.87285,-80.69617 -1.8114,-23.27906 -2.27394,-43.04001 2.709,-41.8556 5.15834,2.14455 13.0242,24.24765 15.31746,47.61886 2.27108,21.97709 9.60454,67.12113 6.84639,74.93291 z"
        class="arc-muscle"
        id="path2-0-9"
        sodipodi:nodetypes="ccccc"
-       style="fill:#ff8668;stroke:#d15a3f;stroke-width:0.820789"
-       inkscape:label="calf"
-       transform="rotate(1.3938917,-56.125277,1409.4989)" />
+       style="fill:#ff8668;stroke:#d15a3f;stroke-width:0.897334"
+       inkscape:label="calf" />
+    <path
+       d="m 600.25154,405.36749 c -8.31161,0.95882 -33.62924,-45.92722 -36.42849,-80.97735 -1.8114,-23.27906 7.75944,-48.08158 12.74238,-46.89717 5.15834,2.14455 2.99082,29.28922 5.28408,52.66043 2.27108,21.97709 21.16018,67.40231 18.40203,75.21409 z"
+       class="arc-muscle"
+       id="path2-0-9-7"
+       sodipodi:nodetypes="ccccc"
+       style="fill:#ff8668;stroke:#d15a3f;stroke-width:0.897334"
+       inkscape:label="calf" />
   </g>
   <g
      id="reflexHammer"
      class="arc-hammer"
      transform="translate(-15.222577,41.492721)">
-    <g
-       id="reflexHammerVisual"
-       transform="translate(759,0) scale(-1 1) translate(-759,0)">
-      <rect
-         x="752.02448"
-         y="2.2639804"
-         width="14"
-         height="54"
-         rx="6"
-         class="arc-hammer-handle"
-         transform="rotate(20)"
-         id="rect9" />
-      <rect
-         x="741.49603"
-         y="-8.2078218"
-         width="36"
-         height="18"
-         rx="7"
-         class="arc-hammer-head"
-         transform="rotate(20)"
-         id="rect10" />
-    </g>
+    <rect
+       x="752.02448"
+       y="2.2639804"
+       width="14"
+       height="54"
+       rx="6"
+       class="arc-hammer-handle"
+       transform="rotate(20)"
+       id="rect9" />
+    <rect
+       x="741.49603"
+       y="-8.2078218"
+       width="36"
+       height="18"
+       rx="7"
+       class="arc-hammer-head"
+       transform="rotate(20)"
+       id="rect10" />
   </g>
   <rect
      x="156.52554"
