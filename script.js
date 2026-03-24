@@ -5,7 +5,7 @@ const reflexItems = [
   { id: "relay", text: "Relay neurone", target: "relay" },
   { id: "motor", text: "Motor neurone", target: "motor" },
   { id: "effector", text: "Effector", target: "effector" },
-  { id: "response", text: "Response (leg kicks)", target: "response" }
+  { id: "response", text: "Response", target: "response" }
 ];
 
 const compareItems = [
@@ -535,6 +535,7 @@ async function setupReflexZoneAlignment() {
 
 async function setupReflexArcAnimation() {
   const playBtn = document.getElementById("playReflexDemo");
+  const stage = document.getElementById("reflexArcStage");
 
   if (!playBtn) {
     return;
@@ -546,12 +547,15 @@ async function setupReflexArcAnimation() {
   }
 
   const hammer = svg.querySelector("#reflexHammer");
+  const hammerVisual = svg.querySelector("#reflexHammerVisual");
+  const hammerHead = svg.querySelector("#rect10");
   const impulseDot = svg.querySelector("#reflexImpulseDot");
   const sensoryPath = svg.querySelector("#sensoryImpulsePath");
   const relayPath = svg.querySelector("#relayImpulsePath");
   const motorPath = svg.querySelector("#motorImpulsePath");
   const quadriceps = svg.querySelector("#quad, [inkscape\\:label=\"quad\"], #path2");
   const lowerLegGroup = svg.querySelector("#lowerLegGroup");
+  const lowerLegTendon = svg.querySelector("#lowerLegGroup #path9");
   const patella = svg.querySelector("#circle5");
 
   if (!hammer || !impulseDot || !sensoryPath || !relayPath || !motorPath) {
@@ -560,6 +564,68 @@ async function setupReflexArcAnimation() {
 
   let isAnimating = false;
   let lowerLegRaf = null;
+  const hammerBaseTransform = hammer.getAttribute("transform") || "";
+  const arcZones = stage ? [...stage.querySelectorAll(".arc-zone")] : [];
+
+  function setArcZonesVisible(visible) {
+    arcZones.forEach((zone) => {
+      zone.style.display = visible ? "" : "none";
+    });
+  }
+
+  function mirrorHammerAboutCurrentLocation() {
+    if (!hammerVisual) {
+      return;
+    }
+
+    const box = hammerVisual.getBBox();
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    hammerVisual.setAttribute(
+      "transform",
+      `translate(${cx.toFixed(2)} ${cy.toFixed(2)}) scale(-1 1) translate(${(-cx).toFixed(2)} ${(-cy).toFixed(2)})`
+    );
+  }
+
+  mirrorHammerAboutCurrentLocation();
+
+  function parseTranslate(transformText) {
+    const match = transformText.match(/translate\(\s*([-\d.]+)(?:[\s,]+([-\d.]+))?\s*\)/i);
+    if (!match) {
+      return { x: 0, y: 0 };
+    }
+    return {
+      x: Number(match[1]) || 0,
+      y: Number(match[2]) || 0
+    };
+  }
+
+  function toSvgSpacePoint(el, x, y) {
+    const ctm = el?.getCTM?.();
+    if (!ctm) {
+      return { x, y };
+    }
+    const p = new DOMPoint(x, y).matrixTransform(ctm);
+    return { x: p.x, y: p.y };
+  }
+
+  function getTendonStrikePoint() {
+    if (!lowerLegTendon) {
+      return null;
+    }
+
+    const len = lowerLegTendon.getTotalLength();
+    const local = lowerLegTendon.getPointAtLength(Math.min(len * 0.06, len));
+    return toSvgSpacePoint(lowerLegTendon, local.x, local.y);
+  }
+
+  function getHammerHeadCenter() {
+    const head = hammerHead || hammer;
+    const box = head.getBBox();
+    const cx = box.x + box.width / 2;
+    const cy = box.y + box.height / 2;
+    return toSvgSpacePoint(head, cx, cy);
+  }
 
   function moveDotToPathStart(path) {
     const start = path.getPointAtLength(0);
@@ -590,16 +656,109 @@ async function setupReflexArcAnimation() {
     });
   }
 
-  function strikeHammer() {
-    hammer.animate(
-      [
-        { transform: "rotate(0deg)", transformOrigin: "603px 264px" },
-        { transform: "rotate(-34deg)", transformOrigin: "603px 264px", offset: 0.45 },
-        { transform: "rotate(12deg)", transformOrigin: "603px 264px", offset: 0.72 },
-        { transform: "rotate(0deg)", transformOrigin: "603px 264px" }
-      ],
-      { duration: 560, easing: "ease-in-out" }
-    );
+  function moveHammerToLowerLegTop() {
+    return new Promise((resolve) => {
+      if (!lowerLegGroup) {
+        resolve({ tx: 0, ty: 0, pivotX: 603, pivotY: 264 });
+        return;
+      }
+
+      const tendonPoint = getTendonStrikePoint();
+      const targetPivotX = tendonPoint ? tendonPoint.x + 10 : 613;
+      const targetPivotY = tendonPoint ? tendonPoint.y : 264;
+      const baseTranslate = parseTranslate(hammerBaseTransform);
+      const hammerHeadCenter = getHammerHeadCenter();
+
+      const targetTranslate = {
+        x: baseTranslate.x + (targetPivotX - hammerHeadCenter.x),
+        y: baseTranslate.y + (targetPivotY - hammerHeadCenter.y)
+      };
+
+      const duration = 260;
+      const start = performance.now();
+
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - (1 - t) * (1 - t);
+        const tx = baseTranslate.x + (targetTranslate.x - baseTranslate.x) * eased;
+        const ty = baseTranslate.y + (targetTranslate.y - baseTranslate.y) * eased;
+        hammer.setAttribute("transform", `translate(${tx.toFixed(2)} ${ty.toFixed(2)})`);
+
+        if (t < 1) {
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        resolve({ tx: targetTranslate.x, ty: targetTranslate.y, pivotX: targetPivotX, pivotY: targetPivotY });
+      };
+
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function strikeHammer(tx, ty, pivotX, pivotY) {
+    return new Promise((resolve) => {
+      const duration = 560;
+      const start = performance.now();
+      const keyTimes = [0, 0.45, 0.72, 1];
+      const keyAngles = [0, -34, 12, 0];
+
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        let angle = 0;
+
+        for (let i = 0; i < keyTimes.length - 1; i += 1) {
+          const t0 = keyTimes[i];
+          const t1 = keyTimes[i + 1];
+          if (t >= t0 && t <= t1) {
+            const local = (t - t0) / (t1 - t0 || 1);
+            angle = keyAngles[i] + (keyAngles[i + 1] - keyAngles[i]) * local;
+            break;
+          }
+        }
+
+        hammer.setAttribute(
+          "transform",
+          `translate(${tx.toFixed(2)} ${ty.toFixed(2)}) rotate(${angle.toFixed(2)} ${pivotX.toFixed(2)} ${pivotY.toFixed(2)})`
+        );
+
+        if (t < 1) {
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        hammer.setAttribute("transform", `translate(${tx.toFixed(2)} ${ty.toFixed(2)})`);
+        resolve();
+      };
+
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function moveHammerHome(fromTx, fromTy) {
+    return new Promise((resolve) => {
+      const baseTranslate = parseTranslate(hammerBaseTransform);
+      const duration = 260;
+      const start = performance.now();
+
+      const tick = (now) => {
+        const t = Math.min(1, (now - start) / duration);
+        const eased = 1 - (1 - t) * (1 - t);
+        const tx = fromTx + (baseTranslate.x - fromTx) * eased;
+        const ty = fromTy + (baseTranslate.y - fromTy) * eased;
+        hammer.setAttribute("transform", `translate(${tx.toFixed(2)} ${ty.toFixed(2)})`);
+
+        if (t < 1) {
+          requestAnimationFrame(tick);
+          return;
+        }
+
+        hammer.setAttribute("transform", hammerBaseTransform);
+        resolve();
+      };
+
+      requestAnimationFrame(tick);
+    });
   }
 
   function contractQuadriceps() {
@@ -667,11 +826,14 @@ async function setupReflexArcAnimation() {
     isAnimating = true;
     playBtn.textContent = "Animating...";
     playBtn.disabled = true;
+    setArcZonesVisible(false);
 
     // Keep the pulse marker visually above all SVG elements while animating.
     svg.appendChild(impulseDot);
 
-    strikeHammer();
+    const hammerPlacement = await moveHammerToLowerLegTop();
+    await strikeHammer(hammerPlacement.tx, hammerPlacement.ty, hammerPlacement.pivotX, hammerPlacement.pivotY);
+    await moveHammerHome(hammerPlacement.tx, hammerPlacement.ty);
 
     impulseDot.style.opacity = "1";
     moveDotToPathStart(sensoryPath);
@@ -692,6 +854,7 @@ async function setupReflexArcAnimation() {
 
     setTimeout(() => {
       impulseDot.style.opacity = "0";
+      setArcZonesVisible(true);
       playBtn.disabled = false;
       playBtn.textContent = "Play Knee-Jerk Animation";
       isAnimating = false;

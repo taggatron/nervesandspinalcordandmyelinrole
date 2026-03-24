@@ -155,8 +155,8 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:zoom="0.91028715"
-     inkscape:cx="417.99997"
-     inkscape:cy="315.28513"
+     inkscape:cx="504.23649"
+     inkscape:cy="280.13138"
      inkscape:window-width="1296"
      inkscape:window-height="905"
      inkscape:window-x="221"
@@ -386,24 +386,28 @@
      id="reflexHammer"
      class="arc-hammer"
      transform="translate(-15.222577,41.492721)">
-    <rect
-       x="752.02448"
-       y="2.2639804"
-       width="14"
-       height="54"
-       rx="6"
-       class="arc-hammer-handle"
-       transform="rotate(20)"
-       id="rect9" />
-    <rect
-       x="741.49603"
-       y="-8.2078218"
-       width="36"
-       height="18"
-       rx="7"
-       class="arc-hammer-head"
-       transform="rotate(20)"
-       id="rect10" />
+    <g
+       id="reflexHammerVisual"
+       transform="translate(759,0) scale(-1 1) translate(-759,0)">
+      <rect
+         x="752.02448"
+         y="2.2639804"
+         width="14"
+         height="54"
+         rx="6"
+         class="arc-hammer-handle"
+         transform="rotate(20)"
+         id="rect9" />
+      <rect
+         x="741.49603"
+         y="-8.2078218"
+         width="36"
+         height="18"
+         rx="7"
+         class="arc-hammer-head"
+         transform="rotate(20)"
+         id="rect10" />
+    </g>
   </g>
   <rect
      x="156.52554"
@@ -442,8 +446,8 @@
      transform="rotate(-60.252582,413.21172,316.99114)"
      style="fill:#1d5db9" />
   <text
-     x="636.01099"
-     y="273.92368"
+     x="585.47748"
+     y="249.75548"
      class="arc-caption small"
      id="text13">Patellar tendon</text>
   <text
