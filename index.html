@@ -321,6 +321,11 @@
 
             <div id="apPump" class="ap-pump" aria-label="Sodium potassium ATPase pump">
               <span class="ap-pump-label">Na+/K+ ATPase</span>
+              <span class="ap-pump-ion ap-pump-ion-na ap-pump-ion-na-1" aria-hidden="true">Na+</span>
+              <span class="ap-pump-ion ap-pump-ion-na ap-pump-ion-na-2" aria-hidden="true">Na+</span>
+              <span class="ap-pump-ion ap-pump-ion-na ap-pump-ion-na-3" aria-hidden="true">Na+</span>
+              <span class="ap-pump-ion ap-pump-ion-k ap-pump-ion-k-1" aria-hidden="true">K+</span>
+              <span class="ap-pump-ion ap-pump-ion-k ap-pump-ion-k-2" aria-hidden="true">K+</span>
             </div>
 
             <div id="apKChannel" class="ap-channel ap-channel-k" aria-label="Voltage-gated potassium channel">
@@ -348,6 +353,27 @@
             <button id="apPlayPause" class="btn" type="button">Play</button>
             <button id="apStep" class="btn btn-ghost" type="button">Step</button>
             <button id="apReset" class="btn btn-ghost" type="button">Reset</button>
+          </div>
+
+          <div class="ap-trace-wrap" aria-label="Action potential trace">
+            <svg id="apTrace" viewBox="0 0 420 180" role="img" aria-label="Action potential stages over time">
+              <rect x="34" y="14" width="368" height="142" rx="10" class="ap-trace-bg"></rect>
+              <line x1="34" y1="85" x2="402" y2="85" class="ap-trace-axis"></line>
+              <line x1="60" y1="14" x2="60" y2="156" class="ap-trace-axis"></line>
+              <text x="14" y="24" class="ap-trace-label">+40</text>
+              <text x="20" y="88" class="ap-trace-label">0</text>
+              <text x="12" y="156" class="ap-trace-label">-90</text>
+              <text x="9" y="172" class="ap-trace-title">mV</text>
+              <text x="332" y="172" class="ap-trace-title">time (ms)</text>
+
+              <polyline id="apTraceBase" class="ap-trace-base" points=""></polyline>
+              <polyline id="apTraceSeg-resting" class="ap-trace-seg" points=""></polyline>
+              <polyline id="apTraceSeg-depolarization" class="ap-trace-seg" points=""></polyline>
+              <polyline id="apTraceSeg-repolarization" class="ap-trace-seg" points=""></polyline>
+              <polyline id="apTraceSeg-hyperpolarization" class="ap-trace-seg" points=""></polyline>
+              <polyline id="apTraceSeg-recovery" class="ap-trace-seg" points=""></polyline>
+              <circle id="apTraceMarker" class="ap-trace-marker" cx="60" cy="131"></circle>
+            </svg>
           </div>
 
           <ol class="ap-phase-list" id="apPhaseList" aria-label="Action potential phases">

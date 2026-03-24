@@ -1821,8 +1821,12 @@ function setupActionPotentials() {
   const playPauseBtn = document.getElementById("apPlayPause");
   const stepBtn = document.getElementById("apStep");
   const resetBtn = document.getElementById("apReset");
+  const traceBase = document.getElementById("apTraceBase");
+  const traceMarker = document.getElementById("apTraceMarker");
+  const chargeOut = model.querySelector(".ap-charge-out");
+  const chargeIn = model.querySelector(".ap-charge-in");
 
-  if (!model || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn) {
+  if (!model || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn || !traceBase || !traceMarker || !chargeOut || !chargeIn) {
     return;
   }
 
@@ -1858,6 +1862,73 @@ function setupActionPotentials() {
   let isPlaying = false;
   let timer = null;
 
+  function actionPotentialValue(t) {
+    if (t < 0.12) return -70;
+    if (t < 0.2) return -70 + ((t - 0.12) / 0.08) * 105;
+    if (t < 0.34) return 35 - ((t - 0.2) / 0.14) * 117;
+    if (t < 0.5) return -82 + ((t - 0.34) / 0.16) * 12;
+    return -70;
+  }
+
+  function voltageToTraceY(v) {
+    const clamped = Math.max(-90, Math.min(40, v));
+    return 85 - clamped * (65 / 90);
+  }
+
+  function tracePointForT(t) {
+    const x = 60 + t * 320;
+    const y = voltageToTraceY(actionPotentialValue(t));
+    return { x, y };
+  }
+
+  function buildTracePoints(startT, endT, steps) {
+    const points = [];
+    for (let i = 0; i <= steps; i += 1) {
+      const t = startT + ((endT - startT) * i) / steps;
+      const p = tracePointForT(t);
+      points.push(`${p.x.toFixed(1)},${p.y.toFixed(1)}`);
+    }
+    return points.join(" ");
+  }
+
+  const segmentRanges = {
+    resting: [0, 0.12],
+    depolarization: [0.12, 0.2],
+    repolarization: [0.2, 0.34],
+    hyperpolarization: [0.34, 0.5],
+    recovery: [0.5, 1]
+  };
+
+  const chargeByPhase = {
+    resting: { out: "+", in: "-" },
+    depolarization: { out: "-", in: "+" },
+    repolarization: { out: "+", in: "-" },
+    hyperpolarization: { out: "+", in: "-" },
+    recovery: { out: "+", in: "-" }
+  };
+
+  traceBase.setAttribute("points", buildTracePoints(0, 1, 140));
+
+  Object.entries(segmentRanges).forEach(([id, range]) => {
+    const seg = document.getElementById(`apTraceSeg-${id}`);
+    if (!seg) return;
+    seg.setAttribute("points", buildTracePoints(range[0], range[1], 24));
+  });
+
+  function setCharge(el, sign) {
+    const changed = el.textContent !== sign;
+    el.textContent = sign;
+    el.classList.toggle("positive", sign === "+");
+    el.classList.toggle("negative", sign === "-");
+
+    if (changed) {
+      el.classList.remove("swap");
+      // Force reflow so the swap animation restarts on each sign change.
+      void el.offsetWidth;
+      el.classList.add("swap");
+    }
+  }
+
   function applyPhase() {
     const phase = phases[phaseIndex];
     model.className = `ap-node-model phase-${phase.id}`;
@@ -1867,6 +1938,19 @@ function setupActionPotentials() {
     phaseList.querySelectorAll("li[data-phase]").forEach((item) => {
       item.classList.toggle("active", item.dataset.phase === phase.id);
     });
+
+    document.querySelectorAll(".ap-trace-seg").forEach((seg) => {
+      seg.classList.toggle("active", seg.id === `apTraceSeg-${phase.id}`);
+    });
+
+    const range = segmentRanges[phase.id] || [0, 0.12];
+    const mid = tracePointForT((range[0] + range[1]) / 2);
+    traceMarker.setAttribute("cx", mid.x.toFixed(1));
+    traceMarker.setAttribute("cy", mid.y.toFixed(1));
+
+    const chargeState = chargeByPhase[phase.id] || chargeByPhase.resting;
+    setCharge(chargeOut, chargeState.out);
+    setCharge(chargeIn, chargeState.in);
   }
 
   function stopPlayback() {
