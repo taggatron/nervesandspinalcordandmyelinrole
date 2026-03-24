@@ -1,5 +1,62 @@
-<svg id="reflexArcSvg" viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" aria-label="Simplified knee-jerk reflex arc diagram">
-  <style>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   id="reflexArcSvg"
+   viewBox="0 0 760 420"
+   aria-label="Simplified knee-jerk reflex arc diagram"
+   version="1.1"
+   sodipodi:docname="reflex-arc.svg"
+   inkscape:version="1.4 (e7c3feb1, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs16">
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect17"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+    <inkscape:path-effect
+       effect="bspline"
+       id="path-effect16"
+       is_visible="true"
+       lpeversion="1.3"
+       weight="33.333333"
+       steps="2"
+       helper_size="0"
+       apply_no_weight="true"
+       apply_with_weight="true"
+       only_selected="false"
+       uniform="false" />
+  </defs>
+  <sodipodi:namedview
+     id="namedview16"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="4.7889099"
+     inkscape:cx="234.29131"
+     inkscape:cy="209.54664"
+     inkscape:window-width="1464"
+     inkscape:window-height="768"
+     inkscape:window-x="299"
+     inkscape:window-y="42"
+     inkscape:window-maximized="0"
+     inkscape:current-layer="reflexArcSvg" />
+  <style
+     id="style1">
     .arc-bg {
       fill: #f8fbff;
     }
@@ -100,7 +157,7 @@
       fill: #26456f;
       font-size: 16px;
       font-weight: 700;
-      font-family: Outfit, "Segoe UI", sans-serif;
+      font-family: Outfit, &quot;Segoe UI&quot;, sans-serif;
     }
 
     .arc-caption.small {
@@ -111,7 +168,7 @@
       fill: #1f3660;
       font-size: 22px;
       font-weight: 800;
-      font-family: Outfit, "Segoe UI", sans-serif;
+      font-family: Outfit, &quot;Segoe UI&quot;, sans-serif;
     }
 
     .arc-hammer-handle {
@@ -132,46 +189,168 @@
       filter: drop-shadow(0 0 9px rgba(255, 190, 60, 0.95));
     }
   </style>
-
-  <rect x="0" y="0" width="760" height="420" class="arc-bg" />
-
-  <path d="M504,92 C582,86 640,128 648,198 C652,236 636,272 606,284 C561,302 513,270 501,225 C487,174 484,116 504,92 Z" class="arc-limb" />
-  <path d="M515,118 C567,97 617,122 631,167 C640,197 624,225 593,235 C561,244 531,230 519,201 C507,174 497,136 515,118 Z" class="arc-muscle" />
-  <path d="M522,150 C548,136 575,139 594,160" class="arc-fibers" />
-  <path d="M528,176 C554,163 581,167 601,188" class="arc-fibers" />
-  <path d="M536,203 C560,192 585,197 602,214" class="arc-fibers" />
-
-  <line x1="560" y1="104" x2="589" y2="248" class="arc-bone femur" />
-  <circle cx="590" cy="257" r="11" class="arc-patella" />
-
-  <g id="lowerLegGroup">
-    <path d="M579,268 C568,312 555,350 547,390" class="arc-bone tibia" />
-    <path d="M602,274 C610,314 621,348 630,387" class="arc-bone fibula" />
-    <path d="M544,389 C572,396 601,396 628,388" class="arc-foot" />
-    <path d="M590,268 C586,282 585,294 584,307" class="arc-tendon" />
-    <circle cx="584" cy="307" r="6" class="arc-tuberosity" />
+  <rect
+     x="0"
+     y="0"
+     width="760"
+     height="420"
+     class="arc-bg"
+     id="rect1" />
+  <path
+     d="m 455.76277,157.99206 c 55.35755,-55.27696 126.73192,-61.082101 178.32643,-13.10288 27.74797,26.26881 39.00086,64.02291 24.01181,92.64682 -22.48358,42.93587 -79.75826,49.83593 -118.13575,23.45092 C 496.16689,231.344 456.17388,189.23035 455.76277,157.99206 Z"
+     class="arc-limb"
+     id="path1" />
+  <path
+     d="m 548.48346,262.1429 c 56.92683,-4.878 99.25703,29.26806 105.09568,86.17815 2.91932,30.89406 -8.75798,60.16211 -30.65291,69.91813 -32.8424,14.63402 -67.87429,-11.38203 -76.63226,-47.96709 -10.21764,-41.46307 -12.40713,-88.61715 2.18949,-108.12919 z"
+     class="arc-limb"
+     id="path1-0"
+     style="fill:#ffd8bd;stroke:#d9936d;stroke-width:1.54059" />
+  <path
+     d="m 518.88658,153.08361 c 5.77246,-35.15665 63.26883,-40.6224 100.39968,-13.74828 24.62236,18.04486 44.65354,37.77453 39.44289,56.926 -6.30766,18.82042 -34.65984,26.90736 -59.7638,10.739 -23.69926,-14.73354 -74.54017,-34.04878 -80.07877,-53.91672 z"
+     class="arc-muscle"
+     id="path2"
+     sodipodi:nodetypes="ccccc" />
+  <path
+     d="M522,150 C548,136 575,139 594,160"
+     class="arc-fibers"
+     id="path3" />
+  <path
+     d="M528,176 C554,163 581,167 601,188"
+     class="arc-fibers"
+     id="path4" />
+  <path
+     d="M536,203 C560,192 585,197 602,214"
+     class="arc-fibers"
+     id="path5" />
+  <path
+     style="fill:#d7e4fb;stroke:#cf7f5a;stroke-width:16;stroke-linecap:round"
+     d="M 550.13169,250.52726 C 534.77743,220.0499 519.42317,189.57254 505.57273,164.9653 491.7223,140.35807 479.37571,121.62098 467.02911,102.88387"
+     id="path16"
+     inkscape:path-effect="#path-effect16"
+     inkscape:original-d="M 550.13169,250.52726 C 534.77742,220.0499 519.42316,189.57254 504.0689,159.09517 491.7223,140.35807 479.37571,121.62098 467.02911,102.88387"
+     inkscape:label="line5"
+     transform="rotate(-41.391394,575.91016,114.58968)"
+     sodipodi:nodetypes="ccc" />
+  <circle
+     cx="590"
+     cy="257"
+     r="11"
+     class="arc-patella"
+     id="circle5" />
+  <g
+     id="lowerLegGroup">
+    <path
+       d="M579,268 C568,312 555,350 547,390"
+       class="arc-bone tibia"
+       id="path6" />
+    <path
+       d="M602,274 C610,314 621,348 630,387"
+       class="arc-bone fibula"
+       id="path7" />
+    <path
+       d="M544,389 C572,396 601,396 628,388"
+       class="arc-foot"
+       id="path8" />
+    <path
+       d="M590,268 C586,282 585,294 584,307"
+       class="arc-tendon"
+       id="path9" />
+    <circle
+       cx="584"
+       cy="307"
+       r="6"
+       class="arc-tuberosity"
+       id="circle9" />
   </g>
-
-  <g id="reflexHammer" class="arc-hammer">
-    <rect x="646" y="232" width="14" height="54" rx="6" class="arc-hammer-handle" transform="rotate(20 653 259)" />
-    <rect x="629" y="220" width="36" height="18" rx="7" class="arc-hammer-head" transform="rotate(20 647 229)" />
+  <g
+     id="reflexHammer"
+     class="arc-hammer">
+    <rect
+       x="646"
+       y="232"
+       width="14"
+       height="54"
+       rx="6"
+       class="arc-hammer-handle"
+       transform="rotate(20 653 259)"
+       id="rect9" />
+    <rect
+       x="629"
+       y="220"
+       width="36"
+       height="18"
+       rx="7"
+       class="arc-hammer-head"
+       transform="rotate(20 647 229)"
+       id="rect10" />
   </g>
-
-  <rect x="260" y="126" width="104" height="154" rx="50" class="arc-cord" />
-  <path d="M280,200 C300,154 325,154 344,200 C325,244 300,244 280,200 Z" class="arc-grey" />
-
-  <path id="sensoryImpulsePath" d="M584,307 C544,288 486,252 422,222 C399,212 382,207 364,208" class="arc-path sensory" />
-  <path id="relayImpulsePath" d="M334,200 C318,198 301,198 287,201" class="arc-path relay" />
-  <path id="motorImpulsePath" d="M364,208 C426,190 486,166 542,151 C565,145 580,143 595,146" class="arc-path motor" />
-
-  <circle id="reflexImpulseDot" cx="584" cy="307" r="6" />
-
-  <polygon points="420,212 405,206 407,220" class="arc-arrow" />
-  <polygon points="476,198 463,190 463,205" class="arc-arrow" />
-
-  <text x="566" y="92" class="arc-caption">Quadriceps</text>
-  <text x="608" y="271" class="arc-caption small">Patellar tendon</text>
-  <text x="616" y="331" class="arc-caption small">Tibia</text>
-  <text x="250" y="102" class="arc-caption">Spinal Cord</text>
-  <text x="36" y="34" class="arc-title">Patellar (Knee-Jerk) Reflex</text>
+  <rect
+     x="161.32838"
+     y="-234.8761"
+     width="104"
+     height="154"
+     rx="50"
+     class="arc-cord"
+     id="rect11"
+     transform="rotate(87.314573)" />
+  <path
+     d="m 140.32111,208.78073 c 2.5,-5.75 5.4579,-14.92137 8.09266,-19.23387 2.63477,-4.3125 3.45519,-14.65238 6.18176,-17.52738 2.72656,-2.875 11.33512,34.22612 14.11051,32.78862 2.77539,-1.4375 5.56445,-0.69454 8.3457,-0.69454 2.78125,0 -3.42439,-35.19757 -0.68025,-33.76007 2.74414,1.4375 5.45898,3.59375 8.12305,6.46875 2.66406,2.875 5.27734,6.46875 7.81835,10.78125 2.54102,4.3125 5.00977,9.34375 7.38477,15.09375 -2.375,5.5 18.51685,25.39955 15.97583,29.52455 -2.54101,4.125 -5.91478,8.15716 -16.41969,10.90716 -3.704,0.96964 -17.8412,-15.04553 -16.40902,-13.46171 2.05864,2.27661 -8.76228,-21.18238 -11.54353,-21.18238 -2.78125,0 -8.74123,27.19671 -7.60679,24.31462 1.60974,-4.08961 -15.03933,17.69174 -17.76589,14.94174 -2.72657,-2.75 -15.21364,-9.44771 -17.84841,-13.57271 -2.63476,-4.125 14.74095,-19.88778 12.24095,-25.38778 z"
+     class="arc-grey"
+     id="path11"
+     sodipodi:nodetypes="cssssssscsssssssc" />
+  <path
+     id="sensoryImpulsePath"
+     d="m 575.64962,306.13243 c -67.20792,-18.79696 -214.50524,11.3418 -302.94803,1.81283 -40.76566,-6.71149 -19.40795,-66.92633 -49.65151,-65.93701"
+     class="arc-path sensory"
+     sodipodi:nodetypes="ccc" />
+  <path
+     id="relayImpulsePath"
+     d="m 223.52186,238.22481 c -8,-1 -29.0159,-10.03969 -27.64733,-28.89518 1.36858,-18.85548 25.12162,-47.52675 18.12162,-46.02675"
+     class="arc-path relay"
+     sodipodi:nodetypes="csc" />
+  <path
+     id="motorImpulsePath"
+     d="m 220.2172,160.96655 c 104.17228,-17.80766 190.77301,5.67261 284.8641,-9.1671 38.64456,-5.93589 63.84753,-7.91452 89.0505,-4.94657"
+     class="arc-path motor"
+     sodipodi:nodetypes="ccc" />
+  <circle
+     id="reflexImpulseDot"
+     cx="584"
+     cy="307"
+     r="6" />
+  <polygon
+     points="407,220 420,212 405,206 "
+     class="arc-arrow"
+     id="polygon11"
+     transform="translate(-52.646108,-57.051563)" />
+  <polygon
+     points="476,198 463,190 463,205 "
+     class="arc-arrow"
+     id="polygon12"
+     transform="rotate(-59.371584,532.27204,297.74769)" />
+  <text
+     x="566"
+     y="92"
+     class="arc-caption"
+     id="text12">Quadriceps</text>
+  <text
+     x="608"
+     y="271"
+     class="arc-caption small"
+     id="text13">Patellar tendon</text>
+  <text
+     x="616"
+     y="331"
+     class="arc-caption small"
+     id="text14">Tibia</text>
+  <text
+     x="128.62421"
+     y="107.39448"
+     class="arc-caption"
+     id="text15">Spinal Cord</text>
+  <text
+     x="36"
+     y="34"
+     class="arc-title"
+     id="text16">Patellar (Knee-Jerk) Reflex</text>
 </svg>
