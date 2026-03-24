@@ -1,4 +1,138 @@
 <svg id="reflexArcSvg" viewBox="0 0 760 420" xmlns="http://www.w3.org/2000/svg" aria-label="Simplified knee-jerk reflex arc diagram">
+  <style>
+    .arc-bg {
+      fill: #f8fbff;
+    }
+
+    .arc-limb {
+      fill: #ffd8bd;
+      stroke: #d9936d;
+      stroke-width: 2;
+    }
+
+    .arc-muscle {
+      fill: #ff8668;
+      stroke: #d15a3f;
+      stroke-width: 2;
+    }
+
+    .arc-fibers {
+      fill: none;
+      stroke: rgba(162, 58, 45, 0.45);
+      stroke-width: 2;
+      stroke-linecap: round;
+    }
+
+    .arc-bone {
+      stroke: #f6f9ff;
+      stroke-width: 9;
+      stroke-linecap: round;
+      fill: none;
+    }
+
+    .arc-bone.femur {
+      stroke-width: 11;
+    }
+
+    .arc-foot {
+      fill: none;
+      stroke: #f6f9ff;
+      stroke-width: 8;
+      stroke-linecap: round;
+    }
+
+    .arc-patella {
+      fill: #fff0c8;
+      stroke: #d89b2f;
+      stroke-width: 2;
+    }
+
+    .arc-tendon {
+      fill: none;
+      stroke: #f4e6b2;
+      stroke-width: 6;
+      stroke-linecap: round;
+    }
+
+    .arc-tuberosity {
+      fill: #f6f9ff;
+      stroke: #8ca1cb;
+      stroke-width: 1.4;
+    }
+
+    .arc-cord {
+      fill: #fbe3f1;
+      stroke: #c4709a;
+      stroke-width: 2;
+    }
+
+    .arc-grey {
+      fill: #f5bfdc;
+      stroke: #bb628f;
+      stroke-width: 1.4;
+    }
+
+    .arc-path {
+      fill: none;
+      stroke-width: 6;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+    }
+
+    .arc-path.sensory {
+      stroke: #2f75ff;
+    }
+
+    .arc-path.relay {
+      stroke: #aa4ec7;
+      stroke-width: 5;
+    }
+
+    .arc-path.motor {
+      stroke: #00a891;
+    }
+
+    .arc-arrow {
+      fill: #1d5db9;
+    }
+
+    .arc-caption {
+      fill: #26456f;
+      font-size: 16px;
+      font-weight: 700;
+      font-family: Outfit, "Segoe UI", sans-serif;
+    }
+
+    .arc-caption.small {
+      font-size: 13px;
+    }
+
+    .arc-title {
+      fill: #1f3660;
+      font-size: 22px;
+      font-weight: 800;
+      font-family: Outfit, "Segoe UI", sans-serif;
+    }
+
+    .arc-hammer-handle {
+      fill: #85633f;
+    }
+
+    .arc-hammer-head {
+      fill: #c7d2e7;
+      stroke: #7a8cab;
+      stroke-width: 1.6;
+    }
+
+    #reflexImpulseDot {
+      fill: #ffd24a;
+      stroke: #ffffff;
+      stroke-width: 2;
+      opacity: 0;
+      filter: drop-shadow(0 0 9px rgba(255, 190, 60, 0.95));
+    }
+  </style>
+
   <rect x="0" y="0" width="760" height="420" class="arc-bg" />
 
   <path d="M504,92 C582,86 640,128 648,198 C652,236 636,272 606,284 C561,302 513,270 501,225 C487,174 484,116 504,92 Z" class="arc-limb" />
