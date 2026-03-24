@@ -1102,16 +1102,22 @@ function setupSaltatoryConduction() {
 function setupCompareTask() {
   const bank = document.getElementById("compareBank");
   const feedback = document.getElementById("compareFeedback");
+  const checkCompareBtn = document.getElementById("checkCompare");
   const drops = {
     motor: document.getElementById("motorDrop"),
     sensory: document.getElementById("sensoryDrop"),
     both: document.getElementById("bothDrop")
   };
 
+  function clearCompareSuccessState() {
+    checkCompareBtn.classList.remove("compare-correct");
+  }
+
   function reset() {
     bank.innerHTML = "";
     feedback.textContent = "";
     feedback.className = "feedback";
+    clearCompareSuccessState();
 
     shuffle(compareItems).forEach((item) => {
       bank.appendChild(chipTemplate(item));
@@ -1124,6 +1130,7 @@ function setupCompareTask() {
         const chip = document.querySelector(`.chip[data-id="${id}"]`);
         if (!chip) return;
         dropEl.appendChild(chip);
+        clearCompareSuccessState();
       });
     });
 
@@ -1132,10 +1139,11 @@ function setupCompareTask() {
       const chip = document.querySelector(`.chip[data-id="${id}"]`);
       if (!chip) return;
       bank.appendChild(chip);
+      clearCompareSuccessState();
     });
   }
 
-  document.getElementById("checkCompare").addEventListener("click", () => {
+  checkCompareBtn.addEventListener("click", () => {
     let correct = 0;
 
     compareItems.forEach((item) => {
@@ -1151,9 +1159,11 @@ function setupCompareTask() {
     if (correct === total) {
       feedback.textContent = "Perfect sort. You can now articulate key similarities and differences.";
       feedback.className = "feedback good";
+      checkCompareBtn.classList.add("compare-correct");
       return;
     }
 
+    clearCompareSuccessState();
     feedback.textContent = `You have ${correct}/${total} correct. Revisit impulse direction and cell body location.`;
     feedback.className = "feedback bad";
   });

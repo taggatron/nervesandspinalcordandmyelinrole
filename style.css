@@ -373,6 +373,28 @@ h4 {
   border: 1px solid var(--line);
 }
 
+#checkCompare.compare-correct {
+  background: #2f9a55;
+  color: #f5fff8;
+  box-shadow: 0 0 0 2px rgba(47, 154, 85, 0.22);
+  animation: compare-check-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes compare-check-pulse {
+  0% {
+    transform: scale(1);
+  }
+  35% {
+    transform: scale(1.04);
+  }
+  70% {
+    transform: scale(0.97);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
 .feedback {
   margin: 12px 0 2px;
   min-height: 22px;
