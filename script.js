@@ -534,7 +534,7 @@ async function setupReflexArcAnimation() {
   const sensoryPath = svg.querySelector("#sensoryImpulsePath");
   const relayPath = svg.querySelector("#relayImpulsePath");
   const motorPath = svg.querySelector("#motorImpulsePath");
-  const quadriceps = svg.querySelector("#quad");
+  const quadriceps = svg.querySelector("#quad, [inkscape\\:label=\"quad\"], #path2");
 
   if (!hammer || !impulseDot || !sensoryPath || !relayPath || !motorPath) {
     return;
@@ -589,10 +589,10 @@ async function setupReflexArcAnimation() {
     quadriceps.animate(
       [
         { transform: "scaleX(1)", transformOrigin: "center center", transformBox: "fill-box" },
-        { transform: "scaleX(0.9)", transformOrigin: "center center", transformBox: "fill-box", offset: 0.45 },
+        { transform: "scaleX(0.78)", transformOrigin: "center center", transformBox: "fill-box", offset: 0.45 },
         { transform: "scaleX(1)", transformOrigin: "center center", transformBox: "fill-box" }
       ],
-      { duration: 420, easing: "ease-out" }
+      { duration: 520, easing: "cubic-bezier(0.2, 0.9, 0.3, 1)" }
     );
   }
 
