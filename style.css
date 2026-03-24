@@ -441,7 +441,7 @@ h4 {
 .neurone-label-text {
   font-size: 13px;
   font-weight: 700;
-  fill: #173460;
+  fill: #8fdc9b;
   pointer-events: none;
 }
 
@@ -553,6 +553,58 @@ h4 {
   margin-top: 8px;
   color: var(--ink);
   font-weight: 600;
+}
+
+.salt-ion-panel {
+  margin-top: 10px;
+  padding: 10px;
+  border: 1px dashed rgba(15, 157, 88, 0.35);
+  border-radius: 10px;
+  background: rgba(242, 255, 248, 0.78);
+}
+
+.salt-ion-status {
+  margin: 0 0 8px;
+  font-weight: 700;
+  color: #1c6a4c;
+}
+
+.salt-ion-marker {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  pointer-events: none;
+}
+
+.salt-ion-marker.show {
+  opacity: 1;
+}
+
+.salt-ion-marker.na {
+  fill: #2f75ff;
+}
+
+.salt-ion-marker.k {
+  fill: #0f9d58;
+}
+
+.salt-node.ion-na {
+  fill: #d9ecff;
+  stroke: #2f75ff;
+}
+
+.salt-node.ion-k {
+  fill: #d8f7e3;
+  stroke: #0f9d58;
+}
+
+#saltSpark.ion-na {
+  fill: #2f75ff;
+}
+
+#saltSpark.ion-k {
+  fill: #0f9d58;
 }
 
 #saltSpeed {

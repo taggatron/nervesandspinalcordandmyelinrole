@@ -338,6 +338,60 @@ async function ensureReflexSvgLoaded() {
   }
 }
 
+async function setupReflexZoneAlignment() {
+  const stage = document.getElementById("reflexArcStage");
+  const host = document.getElementById("reflexArcSvgHost");
+  if (!stage || !host) return;
+
+  const zones = [...stage.querySelectorAll(".arc-zone[data-x][data-y]")];
+  if (!zones.length) return;
+
+  const svg = await ensureReflexSvgLoaded();
+  if (!svg) return;
+
+  function projectZones() {
+    const stageRect = stage.getBoundingClientRect();
+    const svgRect = svg.getBoundingClientRect();
+    const vb = svg.viewBox?.baseVal;
+
+    const vbX = vb?.x ?? 0;
+    const vbY = vb?.y ?? 0;
+    const vbWidth = vb?.width || 760;
+    const vbHeight = vb?.height || 420;
+
+    const offsetLeft = svgRect.left - stageRect.left;
+    const offsetTop = svgRect.top - stageRect.top;
+
+    zones.forEach((zone) => {
+      const x = Number(zone.dataset.x);
+      const y = Number(zone.dataset.y);
+      if (Number.isNaN(x) || Number.isNaN(y)) return;
+
+      const leftPx = offsetLeft + ((x - vbX) / vbWidth) * svgRect.width;
+      const topPx = offsetTop + ((y - vbY) / vbHeight) * svgRect.height;
+
+      zone.style.left = `${leftPx}px`;
+      zone.style.top = `${topPx}px`;
+    });
+  }
+
+  projectZones();
+
+  let rafId = null;
+  const scheduleProjection = () => {
+    if (rafId) cancelAnimationFrame(rafId);
+    rafId = requestAnimationFrame(() => {
+      projectZones();
+      rafId = null;
+    });
+  };
+
+  window.addEventListener("resize", scheduleProjection);
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", scheduleProjection);
+  }
+}
+
 async function setupReflexArcAnimation() {
   const playBtn = document.getElementById("playReflexDemo");
 
@@ -624,6 +678,7 @@ function setupNeurones() {
 }
 
 function setupSaltatoryConduction() {
+  const saltSvg = document.getElementById("saltatorySvg");
   const nodes = [...document.querySelectorAll(".salt-node")];
   const jumps = [...document.querySelectorAll(".salt-jump")];
   const spark = document.getElementById("saltSpark");
@@ -633,14 +688,53 @@ function setupSaltatoryConduction() {
   const resetBtn = document.getElementById("saltReset");
   const speed = document.getElementById("saltSpeed");
   const speedValue = document.getElementById("saltSpeedValue");
+  const ionRevealBtn = document.getElementById("saltToggleIon");
+  const ionPanel = document.getElementById("saltIonPanel");
+  const ionModeBtn = document.getElementById("saltIonMode");
+  const ionStatus = document.getElementById("saltIonStatus");
 
-  if (!nodes.length || !spark || !status || !playPause || !stepBtn || !resetBtn || !speed || !speedValue) {
+  if (!saltSvg || !nodes.length || !spark || !status || !playPause || !stepBtn || !resetBtn || !speed || !speedValue) {
     return;
   }
+
+  const ionPhases = [
+    {
+      id: "na",
+      title: "Depolarization",
+      ionText: "Na+ influx",
+      detail: "Voltage-gated sodium channels open, causing rapid membrane depolarization."
+    },
+    {
+      id: "k",
+      title: "Repolarization",
+      ionText: "K+ efflux",
+      detail: "Sodium channels inactivate and potassium channels open to restore membrane potential."
+    },
+    {
+      id: "rest",
+      title: "Refractory reset",
+      ionText: "Na+/K+ pump recovery",
+      detail: "Ionic gradients are re-established, limiting immediate re-firing at this node."
+    }
+  ];
 
   let currentNode = 0;
   let timer = null;
   let intervalMs = Number(speed.value);
+  let ionModeEnabled = false;
+  let ionPhaseStep = 0;
+
+  const svgNs = "http://www.w3.org/2000/svg";
+  const ionNaMarker = document.createElementNS(svgNs, "text");
+  ionNaMarker.setAttribute("class", "salt-ion-marker na");
+  ionNaMarker.textContent = "Na+ in";
+
+  const ionKMarker = document.createElementNS(svgNs, "text");
+  ionKMarker.setAttribute("class", "salt-ion-marker k");
+  ionKMarker.textContent = "K+ out";
+
+  saltSvg.appendChild(ionNaMarker);
+  saltSvg.appendChild(ionKMarker);
 
   function updateStatus() {
     status.textContent = `Impulse at Node ${currentNode + 1} of ${nodes.length}.`;
@@ -649,6 +743,7 @@ function setupSaltatoryConduction() {
   function paintState() {
     nodes.forEach((node, index) => {
       node.classList.toggle("active", index === currentNode);
+      node.classList.remove("ion-na", "ion-k");
     });
 
     jumps.forEach((jump, index) => {
@@ -658,12 +753,63 @@ function setupSaltatoryConduction() {
     const active = nodes[currentNode];
     spark.setAttribute("cx", active.getAttribute("cx"));
     spark.setAttribute("cy", active.getAttribute("cy"));
+    spark.classList.remove("ion-na", "ion-k");
     updateStatus();
+  }
+
+  function updateIonView() {
+    if (!ionPanel || !ionStatus) {
+      return;
+    }
+
+    if (ionPanel.hidden) {
+      ionNaMarker.classList.remove("show");
+      ionKMarker.classList.remove("show");
+      return;
+    }
+
+    if (!ionModeEnabled) {
+      ionStatus.textContent = "Ion mode is off. Enable it to see Na+ and K+ behavior at the active node.";
+      ionNaMarker.classList.remove("show");
+      ionKMarker.classList.remove("show");
+      return;
+    }
+
+    const phase = ionPhases[ionPhaseStep % ionPhases.length];
+    const active = nodes[currentNode];
+    if (!active) {
+      return;
+    }
+
+    const cx = Number(active.getAttribute("cx"));
+    const cy = Number(active.getAttribute("cy"));
+
+    ionNaMarker.setAttribute("x", String(cx - 20));
+    ionNaMarker.setAttribute("y", String(cy - 28));
+    ionKMarker.setAttribute("x", String(cx - 20));
+    ionKMarker.setAttribute("y", String(cy + 34));
+
+    ionNaMarker.classList.toggle("show", phase.id === "na");
+    ionKMarker.classList.toggle("show", phase.id === "k");
+
+    if (phase.id === "na") {
+      active.classList.add("ion-na");
+      spark.classList.add("ion-na");
+    } else if (phase.id === "k") {
+      active.classList.add("ion-k");
+      spark.classList.add("ion-k");
+    }
+
+    ionStatus.textContent = `Node ${currentNode + 1}: ${phase.title} (${phase.ionText}). ${phase.detail}`;
   }
 
   function stepForward() {
     currentNode = (currentNode + 1) % nodes.length;
+    if (ionModeEnabled) {
+      ionPhaseStep += 1;
+    }
     paintState();
+    updateIonView();
   }
 
   function stopAuto() {
@@ -696,9 +842,32 @@ function setupSaltatoryConduction() {
   resetBtn.addEventListener("click", () => {
     stopAuto();
     currentNode = 0;
+    ionPhaseStep = 0;
     paintState();
     status.textContent = `Impulse ready at Node 1 of ${nodes.length}.`;
+    updateIonView();
   });
+
+  if (ionRevealBtn && ionPanel) {
+    ionRevealBtn.addEventListener("click", () => {
+      const nextHidden = !ionPanel.hidden;
+      ionPanel.hidden = nextHidden;
+      ionRevealBtn.setAttribute("aria-expanded", String(!nextHidden));
+      ionRevealBtn.textContent = nextHidden ? "Show Na+/K+ Ion Simulation" : "Hide Na+/K+ Ion Simulation";
+      updateIonView();
+    });
+  }
+
+  if (ionModeBtn) {
+    ionModeBtn.addEventListener("click", () => {
+      ionModeEnabled = !ionModeEnabled;
+      ionModeBtn.textContent = ionModeEnabled ? "Disable Ion Mode" : "Enable Ion Mode";
+      if (ionModeEnabled) {
+        ionPhaseStep = currentNode;
+      }
+      updateIonView();
+    });
+  }
 
   speed.addEventListener("input", () => {
     intervalMs = Number(speed.value);
@@ -712,6 +881,7 @@ function setupSaltatoryConduction() {
   });
 
   paintState();
+  updateIonView();
   speed.dispatchEvent(new Event("input"));
 }
 
@@ -804,6 +974,7 @@ style.textContent = `
 document.head.appendChild(style);
 
 createReflexTask();
+setupReflexZoneAlignment();
 setupReflexArcAnimation();
 setupMicroscopy();
 setupNeurones();

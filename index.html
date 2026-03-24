@@ -42,13 +42,13 @@
           <div class="reflex-arc-stage" id="reflexArcStage">
             <div id="reflexArcSvgHost" aria-label="Simplified knee-jerk reflex arc diagram"></div>
 
-            <div class="arc-zone" data-target="stimulus" style="left: 85%; top: 72%;"></div>
-            <div class="arc-zone" data-target="receptor" style="left: 76.5%; top: 44%;"></div>
-            <div class="arc-zone" data-target="sensory" style="left: 58%; top: 54.5%;"></div>
-            <div class="arc-zone" data-target="relay" style="left: 40%; top: 48%;"></div>
-            <div class="arc-zone" data-target="motor" style="left: 56%; top: 38%;"></div>
-            <div class="arc-zone" data-target="effector" style="left: 73.5%; top: 30%;"></div>
-            <div class="arc-zone" data-target="response" style="left: 88.5%; top: 24.5%;"></div>
+            <div class="arc-zone" data-target="stimulus" data-x="648" data-y="271" style="left: 85%; top: 72%;"></div>
+            <div class="arc-zone" data-target="receptor" data-x="572" data-y="227" style="left: 76.5%; top: 44%;"></div>
+            <div class="arc-zone" data-target="sensory" data-x="430" data-y="245" style="left: 58%; top: 54.5%;"></div>
+            <div class="arc-zone" data-target="relay" data-x="289" data-y="195" style="left: 40%; top: 48%;"></div>
+            <div class="arc-zone" data-target="motor" data-x="418" data-y="158" style="left: 56%; top: 38%;"></div>
+            <div class="arc-zone" data-target="effector" data-x="553" data-y="128" style="left: 73.5%; top: 30%;"></div>
+            <div class="arc-zone" data-target="response" data-x="694" data-y="110" style="left: 88.5%; top: 24.5%;"></div>
           </div>
         </div>
       </div>
@@ -207,6 +207,28 @@
             <input id="saltSpeed" type="range" min="300" max="1400" step="50" value="850" />
             <span id="saltSpeedValue">850 ms</span>
           </label>
+
+          <button
+            id="saltToggleIon"
+            class="btn btn-ghost"
+            type="button"
+            aria-expanded="false"
+            aria-controls="saltIonPanel"
+          >
+            Show Na+/K+ Ion Simulation
+          </button>
+
+          <div id="saltIonPanel" class="salt-ion-panel" hidden>
+            <p id="saltIonStatus" class="salt-ion-status">
+              Ion view is ready. Click "Enable Ion Mode" to map sodium and potassium channel phases onto each node.
+            </p>
+            <div class="button-row">
+              <button id="saltIonMode" class="btn btn-ghost" type="button">Enable Ion Mode</button>
+            </div>
+            <p class="structure-text">
+              In ion mode, each active node cycles through depolarization (Na+ influx), repolarization (K+ efflux), and refractory reset before the wave continues.
+            </p>
+          </div>
 
           <p class="structure-text">
             Saltatory conduction allows a signal to travel faster because depolarization is regenerated mainly at nodes of Ranvier, not continuously along every part of the membrane.
