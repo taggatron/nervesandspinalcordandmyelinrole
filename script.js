@@ -1377,6 +1377,7 @@ function setupNerveImpulseMeasurement() {
   let draggingId = null;
   let scopeFrame = null;
   let apProgress = null;
+  let idlePhase = 0;
 
   const wireMap = {
     A: { path: wireA, jack: jackA },
@@ -1508,11 +1509,9 @@ function setupNerveImpulseMeasurement() {
   }
 
   function voltageToY(v) {
-    const minV = -90;
-    const maxV = 40;
-    const clamped = Math.max(minV, Math.min(maxV, v));
-    const normalized = (clamped - minV) / (maxV - minV);
-    return 240 - normalized * 220;
+    const clamped = Math.max(-90, Math.min(40, v));
+    // Keep 0 mV aligned to the drawn 0-axis at y=130 while preserving -90 mV at y=240.
+    return 130 - clamped * (110 / 90);
   }
 
   function renderScopeTrace(isRecording) {
@@ -1524,7 +1523,10 @@ function setupNerveImpulseMeasurement() {
       let v;
 
       if (!isRecording) {
-        v = 0;
+        // Low-amplitude environmental noise around 0 mV before measurement is configured.
+        v =
+          Math.sin((i / sampleCount + idlePhase) * Math.PI * 8) * 0.85 +
+          Math.sin((i / sampleCount + idlePhase * 1.7) * Math.PI * 17) * 0.25;
       } else if (apProgress === null) {
         v = -70;
       } else {
@@ -1554,6 +1556,9 @@ function setupNerveImpulseMeasurement() {
 
     const tick = () => {
       const recording = inCorrectRecordingState();
+      if (!recording) {
+        idlePhase = (idlePhase + 0.01) % 1;
+      }
 
       if (recording && apProgress !== null) {
         apProgress += 0.009;
