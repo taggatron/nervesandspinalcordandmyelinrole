@@ -153,6 +153,7 @@ const neuroneData = {
 let draggedChipId = null;
 let selectedChipId = null;
 let selectedChipEl = null;
+const REFLEX_ZONE_DEV_MODE = true;
 
 function shuffle(arr) {
   const a = [...arr];
@@ -349,7 +350,17 @@ async function setupReflexZoneAlignment() {
   const svg = await ensureReflexSvgLoaded();
   if (!svg) return;
 
-  function projectZones() {
+  const targetLabels = {
+    stimulus: "Stimulus",
+    receptor: "Receptor",
+    sensory: "Sensory neurone",
+    relay: "Relay neurone",
+    motor: "Motor neurone",
+    effector: "Effector",
+    response: "Response"
+  };
+
+  function getGeometry() {
     const stageRect = stage.getBoundingClientRect();
     const svgRect = svg.getBoundingClientRect();
     const vb = svg.viewBox?.baseVal;
@@ -362,19 +373,138 @@ async function setupReflexZoneAlignment() {
     const offsetLeft = svgRect.left - stageRect.left;
     const offsetTop = svgRect.top - stageRect.top;
 
+    return {
+      stageRect,
+      svgRect,
+      vbX,
+      vbY,
+      vbWidth,
+      vbHeight,
+      offsetLeft,
+      offsetTop
+    };
+  }
+
+  function viewBoxToStagePx(x, y, geom) {
+    const leftPx = geom.offsetLeft + ((x - geom.vbX) / geom.vbWidth) * geom.svgRect.width;
+    const topPx = geom.offsetTop + ((y - geom.vbY) / geom.vbHeight) * geom.svgRect.height;
+    return { leftPx, topPx };
+  }
+
+  function stagePxToViewBox(leftPx, topPx, geom) {
+    const x = ((leftPx - geom.offsetLeft) / geom.svgRect.width) * geom.vbWidth + geom.vbX;
+    const y = ((topPx - geom.offsetTop) / geom.svgRect.height) * geom.vbHeight + geom.vbY;
+    return {
+      x: Math.max(geom.vbX, Math.min(geom.vbX + geom.vbWidth, x)),
+      y: Math.max(geom.vbY, Math.min(geom.vbY + geom.vbHeight, y))
+    };
+  }
+
+  function updateZoneDebug(zone) {
+    if (!REFLEX_ZONE_DEV_MODE) return;
+    let debug = zone.querySelector(".arc-zone-debug");
+    if (!debug) return;
+
+    const x = Number(zone.dataset.x);
+    const y = Number(zone.dataset.y);
+    if (Number.isNaN(x) || Number.isNaN(y)) return;
+
+    const geom = getGeometry();
+    const leftPct = ((x - geom.vbX) / geom.vbWidth) * 100;
+    const topPct = ((y - geom.vbY) / geom.vbHeight) * 100;
+    const label = targetLabels[zone.dataset.target] || zone.dataset.target;
+
+    debug.textContent = `${label} | L ${leftPct.toFixed(1)}% T ${topPct.toFixed(1)}%`;
+  }
+
+  function ensureZoneDebugElements() {
+    if (!REFLEX_ZONE_DEV_MODE) return;
+    stage.classList.add("reflex-dev-mode");
+
+    zones.forEach((zone) => {
+      if (zone.querySelector(".arc-zone-debug")) return;
+      const debug = document.createElement("div");
+      debug.className = "arc-zone-debug";
+      zone.appendChild(debug);
+      updateZoneDebug(zone);
+    });
+  }
+
+  function setupZoneDragEditing() {
+    if (!REFLEX_ZONE_DEV_MODE) return;
+
+    let dragState = null;
+
+    zones.forEach((zone) => {
+      zone.addEventListener("pointerdown", (event) => {
+        if (event.button !== 0) return;
+        if (event.target.closest(".chip")) return;
+
+        const geom = getGeometry();
+        const zoneRect = zone.getBoundingClientRect();
+        const zoneCenterLeft = zoneRect.left - geom.stageRect.left + zoneRect.width / 2;
+        const zoneCenterTop = zoneRect.top - geom.stageRect.top + zoneRect.height / 2;
+
+        dragState = {
+          zone,
+          pointerId: event.pointerId,
+          offsetX: event.clientX - (geom.stageRect.left + zoneCenterLeft),
+          offsetY: event.clientY - (geom.stageRect.top + zoneCenterTop)
+        };
+
+        zone.classList.add("zone-moving");
+        zone.setPointerCapture(event.pointerId);
+        event.preventDefault();
+        event.stopPropagation();
+      });
+
+      zone.addEventListener("pointermove", (event) => {
+        if (!dragState || dragState.zone !== zone || dragState.pointerId !== event.pointerId) return;
+
+        const geom = getGeometry();
+        const leftPx = Math.max(0, Math.min(geom.stageRect.width, event.clientX - geom.stageRect.left - dragState.offsetX));
+        const topPx = Math.max(0, Math.min(geom.stageRect.height, event.clientY - geom.stageRect.top - dragState.offsetY));
+
+        zone.style.left = `${leftPx}px`;
+        zone.style.top = `${topPx}px`;
+
+        const vbPoint = stagePxToViewBox(leftPx, topPx, geom);
+        zone.dataset.x = vbPoint.x.toFixed(2);
+        zone.dataset.y = vbPoint.y.toFixed(2);
+        updateZoneDebug(zone);
+
+        event.preventDefault();
+      });
+
+      const endDrag = (event) => {
+        if (!dragState || dragState.zone !== zone || dragState.pointerId !== event.pointerId) return;
+        zone.classList.remove("zone-moving");
+        dragState = null;
+      };
+
+      zone.addEventListener("pointerup", endDrag);
+      zone.addEventListener("pointercancel", endDrag);
+    });
+  }
+
+  function projectZones() {
+    const geom = getGeometry();
+
     zones.forEach((zone) => {
       const x = Number(zone.dataset.x);
       const y = Number(zone.dataset.y);
       if (Number.isNaN(x) || Number.isNaN(y)) return;
 
-      const leftPx = offsetLeft + ((x - vbX) / vbWidth) * svgRect.width;
-      const topPx = offsetTop + ((y - vbY) / vbHeight) * svgRect.height;
+      const { leftPx, topPx } = viewBoxToStagePx(x, y, geom);
 
       zone.style.left = `${leftPx}px`;
       zone.style.top = `${topPx}px`;
+      updateZoneDebug(zone);
     });
   }
 
+  ensureZoneDebugElements();
+  setupZoneDragEditing();
   projectZones();
 
   let rafId = null;
