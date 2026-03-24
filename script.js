@@ -153,7 +153,7 @@ const neuroneData = {
 let draggedChipId = null;
 let selectedChipId = null;
 let selectedChipEl = null;
-const REFLEX_ZONE_DEV_MODE = true;
+const REFLEX_ZONE_DEV_MODE = false;
 
 function shuffle(arr) {
   const a = [...arr];
