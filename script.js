@@ -437,8 +437,7 @@ async function setupReflexZoneAlignment() {
 
     zones.forEach((zone) => {
       zone.addEventListener("pointerdown", (event) => {
-        if (event.button !== 0) return;
-        if (event.target.closest(".chip")) return;
+        if (event.pointerType === "mouse" && event.button !== 0) return;
 
         const geom = getGeometry();
         const zoneRect = zone.getBoundingClientRect();

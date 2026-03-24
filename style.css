@@ -257,6 +257,7 @@ h4 {
 
 .reflex-dev-mode .arc-zone {
   cursor: move;
+  touch-action: none;
 }
 
 .reflex-dev-mode .arc-zone.zone-moving {
