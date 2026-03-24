@@ -1,10 +1,10 @@
 const reflexItems = [
-  { id: "stimulus", text: "Stimulus (tap on tendon)", target: "stimulus" },
+  { id: "stimulus", text: "Stimulus", target: "stimulus" },
   { id: "receptor", text: "Receptor (muscle spindle)", target: "receptor" },
   { id: "sensory", text: "Sensory neurone", target: "sensory" },
-  { id: "relay", text: "Relay neurone in spinal cord", target: "relay" },
+  { id: "relay", text: "Relay neurone", target: "relay" },
   { id: "motor", text: "Motor neurone", target: "motor" },
-  { id: "effector", text: "Effector (quadriceps muscle)", target: "effector" },
+  { id: "effector", text: "Effector", target: "effector" },
   { id: "response", text: "Response (leg kicks)", target: "response" }
 ];
 
@@ -780,8 +780,8 @@ function drawNeurone(type) {
     circle.setAttribute("cx", node.x);
     circle.setAttribute("cy", node.y);
     circle.setAttribute("r", "12");
-    circle.setAttribute("fill", "#ffe59d");
-    circle.setAttribute("stroke", "#ec9b23");
+    circle.setAttribute("fill", "#b9efc7");
+    circle.setAttribute("stroke", "#2f9a55");
     circle.setAttribute("stroke-width", "2");
 
     const labelBox = document.createElementNS("http://www.w3.org/2000/svg", "rect");
