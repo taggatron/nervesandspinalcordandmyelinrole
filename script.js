@@ -667,10 +667,56 @@ async function setupReflexArcAnimation() {
 
 function setupMicroscopy() {
   const stage = document.getElementById("microscopyStage");
+  const microscopyImage = document.getElementById("microscopyImage");
+  const scanLine = document.getElementById("scanLine");
   const title = document.getElementById("structureTitle");
   const text = document.getElementById("structureText");
   const legend = document.getElementById("structureLegend");
   const hotspots = [...document.querySelectorAll(".hotspot")];
+  const fadingHotspots = [...document.querySelectorAll(".hotspot.fade-in-target")];
+
+  if (!stage || !microscopyImage || !scanLine) return;
+
+  let revealStep = 2;
+  let revealStarted = false;
+
+  function applyMicroscopyReveal() {
+    const progress = Math.min(1, Math.max(0.2, revealStep / 10));
+    const grayscale = Math.round((1 - progress) * 100);
+    const saturation = progress.toFixed(2);
+
+    microscopyImage.style.opacity = progress.toFixed(2);
+    microscopyImage.style.filter = `grayscale(${grayscale}%) saturate(${saturation}) contrast(1.03)`;
+
+    fadingHotspots.forEach((spot) => {
+      spot.style.opacity = progress.toFixed(2);
+    });
+  }
+
+  applyMicroscopyReveal();
+
+  function advanceMicroscopyReveal() {
+    revealStep = Math.min(10, revealStep + 1);
+    applyMicroscopyReveal();
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting || revealStarted) return;
+        revealStarted = true;
+        stage.classList.add("reveal-active");
+        observer.disconnect();
+      });
+    },
+    { threshold: 0.35 }
+  );
+
+  observer.observe(stage);
+  scanLine.addEventListener("animationiteration", () => {
+    if (!revealStarted || revealStep >= 10) return;
+    advanceMicroscopyReveal();
+  });
 
   hotspots.forEach((spot) => {
     spot.addEventListener("click", () => {
@@ -684,9 +730,9 @@ function setupMicroscopy() {
 
       stage.animate(
         [
-          { transform: "scale(1)", filter: "saturate(1)" },
-          { transform: "scale(1.015)", filter: "saturate(1.1)" },
-          { transform: "scale(1)", filter: "saturate(1)" }
+          { transform: "scale(1)" },
+          { transform: "scale(1.015)" },
+          { transform: "scale(1)" }
         ],
         { duration: 650, easing: "ease-out" }
       );

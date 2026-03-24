@@ -417,10 +417,23 @@ h4 {
   background: #fafcff;
 }
 
+#microscopyBaseImage,
 #microscopyImage {
   width: 100%;
   display: block;
-  filter: saturate(1.08) contrast(1.03);
+}
+
+#microscopyImage {
+  position: absolute;
+  inset: 0;
+  opacity: 0.2;
+  filter: grayscale(80%) saturate(0.2) contrast(1.03);
+  transition: opacity 0.7s ease, filter 0.7s ease;
+}
+
+.hotspot.fade-in-target {
+  opacity: 0.2;
+  transition: opacity 0.7s ease, transform 0.2s ease, background 0.2s ease;
 }
 
 .hotspot {
@@ -491,7 +504,12 @@ h4 {
   height: 2px;
   background: linear-gradient(90deg, transparent, #ffd166, #ff6f3c, transparent);
   animation: scan 4.5s ease-in-out infinite;
+  animation-play-state: paused;
   opacity: 0.7;
+}
+
+.microscopy-stage.reveal-active .scan-line {
+  animation-play-state: running;
 }
 
 @keyframes scan {
