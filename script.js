@@ -408,13 +408,9 @@ async function setupReflexZoneAlignment() {
     const x = Number(zone.dataset.x);
     const y = Number(zone.dataset.y);
     if (Number.isNaN(x) || Number.isNaN(y)) return;
-
-    const geom = getGeometry();
-    const leftPct = ((x - geom.vbX) / geom.vbWidth) * 100;
-    const topPct = ((y - geom.vbY) / geom.vbHeight) * 100;
     const label = targetLabels[zone.dataset.target] || zone.dataset.target;
 
-    debug.textContent = `${label} | L ${leftPct.toFixed(1)}% T ${topPct.toFixed(1)}%`;
+    debug.textContent = `${label} | X ${x.toFixed(2)} Y ${y.toFixed(2)}`;
   }
 
   function ensureZoneDebugElements() {
@@ -577,10 +573,10 @@ async function setupReflexArcAnimation() {
   function strikeHammer() {
     hammer.animate(
       [
-        { transform: "rotate(0deg)", transformOrigin: "653px 259px" },
-        { transform: "rotate(-34deg)", transformOrigin: "653px 259px", offset: 0.45 },
-        { transform: "rotate(12deg)", transformOrigin: "653px 259px", offset: 0.72 },
-        { transform: "rotate(0deg)", transformOrigin: "653px 259px" }
+        { transform: "rotate(0deg)", transformOrigin: "603px 264px" },
+        { transform: "rotate(-34deg)", transformOrigin: "603px 264px", offset: 0.45 },
+        { transform: "rotate(12deg)", transformOrigin: "603px 264px", offset: 0.72 },
+        { transform: "rotate(0deg)", transformOrigin: "603px 264px" }
       ],
       { duration: 560, easing: "ease-in-out" }
     );
