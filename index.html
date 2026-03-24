@@ -258,26 +258,39 @@
             </div>
           </div>
 
+          <div class="button-row">
+            <button id="hhStimulate" class="btn" type="button" disabled>Stimulate Neuron</button>
+          </div>
+
           <p id="hhFeedback" class="feedback" aria-live="polite">Place electrodes to begin recording.</p>
         </div>
 
         <div class="hh-scope-panel">
           <h3>Oscilloscope</h3>
-          <svg id="hhScope" viewBox="0 0 640 280" aria-label="Voltage in millivolts over time">
-            <rect x="50" y="20" width="560" height="220" rx="10" class="hh-scope-bg" />
-            <line x1="50" y1="130" x2="610" y2="130" class="hh-axis" />
-            <line x1="80" y1="20" x2="80" y2="240" class="hh-axis" />
+          <div class="hh-scope-casing">
+            <span id="hhJackA" class="hh-jack hh-jack-a" aria-hidden="true"></span>
+            <span id="hhJackB" class="hh-jack hh-jack-b" aria-hidden="true"></span>
+            <svg id="hhScope" viewBox="0 0 640 280" aria-label="Voltage in millivolts over time">
+              <rect x="50" y="20" width="560" height="220" rx="10" class="hh-scope-bg" />
+              <line x1="50" y1="130" x2="610" y2="130" class="hh-axis" />
+              <line x1="80" y1="20" x2="80" y2="240" class="hh-axis" />
 
-            <text x="20" y="36" class="hh-axis-label">+40</text>
-            <text x="24" y="134" class="hh-axis-label">0</text>
-            <text x="16" y="236" class="hh-axis-label">-90</text>
-            <text x="18" y="254" class="hh-axis-title">mV</text>
-            <text x="560" y="262" class="hh-axis-title">time (ms)</text>
+              <text x="20" y="36" class="hh-axis-label">+40</text>
+              <text x="24" y="134" class="hh-axis-label">0</text>
+              <text x="16" y="236" class="hh-axis-label">-90</text>
+              <text x="18" y="254" class="hh-axis-title">mV</text>
+              <text x="560" y="262" class="hh-axis-title">time (ms)</text>
 
-            <polyline id="hhTrace" class="hh-trace" points=""></polyline>
-          </svg>
+              <polyline id="hhTrace" class="hh-trace" points=""></polyline>
+            </svg>
+          </div>
           <p id="hhScopeReadout" class="salt-status">Vm: -- mV | Waiting for valid electrode positions.</p>
         </div>
+
+        <svg id="hhWireLayer" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path id="hhWireA" class="hh-wire"></path>
+          <path id="hhWireB" class="hh-wire"></path>
+        </svg>
       </div>
     </section>
   </main>

@@ -1355,6 +1355,7 @@ function setupCompareTask() {
 }
 
 function setupNerveImpulseMeasurement() {
+  const measureGrid = document.querySelector(".measure-grid");
   const bank = document.getElementById("hhElectrodeBank");
   const insideDrop = document.getElementById("hhInsideDrop");
   const outsideDrop = document.getElementById("hhOutsideDrop");
@@ -1362,19 +1363,76 @@ function setupNerveImpulseMeasurement() {
   const feedback = document.getElementById("hhFeedback");
   const trace = document.getElementById("hhTrace");
   const readout = document.getElementById("hhScopeReadout");
+  const stimulateBtn = document.getElementById("hhStimulate");
+  const wireA = document.getElementById("hhWireA");
+  const wireB = document.getElementById("hhWireB");
+  const jackA = document.getElementById("hhJackA");
+  const jackB = document.getElementById("hhJackB");
 
-  if (!bank || !insideDrop || !outsideDrop || !electrodes.length || !trace || !readout || !feedback) {
+  if (!measureGrid || !bank || !insideDrop || !outsideDrop || !electrodes.length || !trace || !readout || !feedback || !stimulateBtn || !wireA || !wireB || !jackA || !jackB) {
     return;
   }
 
   let draggedId = null;
+  let draggingId = null;
   let scopeFrame = null;
-  let sweepOffset = 0;
+  let apProgress = null;
+
+  const wireMap = {
+    A: { path: wireA, jack: jackA },
+    B: { path: wireB, jack: jackB }
+  };
+
+  function toGridPoint(clientX, clientY) {
+    const gridRect = measureGrid.getBoundingClientRect();
+    return {
+      x: clientX - gridRect.left,
+      y: clientY - gridRect.top
+    };
+  }
+
+  function elementCenterInGrid(el) {
+    const rect = el.getBoundingClientRect();
+    return toGridPoint(rect.left + rect.width / 2, rect.top + rect.height / 2);
+  }
+
+  function drawWire(pathEl, from, to) {
+    const c1x = from.x + Math.max(55, (to.x - from.x) * 0.32);
+    const c1y = from.y;
+    const c2x = to.x - Math.max(85, (to.x - from.x) * 0.4);
+    const c2y = to.y;
+    pathEl.setAttribute("d", `M ${from.x.toFixed(2)} ${from.y.toFixed(2)} C ${c1x.toFixed(2)} ${c1y.toFixed(2)} ${c2x.toFixed(2)} ${c2y.toFixed(2)} ${to.x.toFixed(2)} ${to.y.toFixed(2)}`);
+  }
+
+  function updateWires(pointerById = {}) {
+    ["A", "B"].forEach((id) => {
+      const electrode = document.querySelector(`.electrode-chip[data-id="${id}"]`);
+      const targetWire = wireMap[id];
+      if (!electrode || !targetWire) return;
+
+      const start = pointerById[id] || elementCenterInGrid(electrode);
+      const end = elementCenterInGrid(targetWire.jack);
+      drawWire(targetWire.path, start, end);
+    });
+  }
 
   electrodes.forEach((el) => {
     el.addEventListener("dragstart", (event) => {
       draggedId = el.dataset.id;
+      draggingId = draggedId;
       event.dataTransfer.setData("text/plain", draggedId);
+      updateWires();
+    });
+
+    el.addEventListener("drag", (event) => {
+      if (!draggingId || event.clientX <= 0 || event.clientY <= 0) return;
+      const pointer = toGridPoint(event.clientX, event.clientY);
+      updateWires({ [draggingId]: pointer });
+    });
+
+    el.addEventListener("dragend", () => {
+      draggingId = null;
+      updateWires();
     });
   });
 
@@ -1390,6 +1448,7 @@ function setupNerveImpulseMeasurement() {
 
     dropEl.appendChild(electrode);
     updateMeasurementState();
+    updateWires();
   }
 
   function wireDropzone(dropEl) {
@@ -1431,6 +1490,7 @@ function setupNerveImpulseMeasurement() {
     if (!electrode) return;
     bank.appendChild(electrode);
     updateMeasurementState();
+    updateWires();
   });
 
   function inCorrectRecordingState() {
@@ -1463,12 +1523,17 @@ function setupNerveImpulseMeasurement() {
       const x = 80 + (i / sampleCount) * 530;
       let v;
 
-      if (isRecording) {
-        const t = ((i / sampleCount) + sweepOffset) % 1;
-        v = actionPotentialValue(t);
+      if (!isRecording) {
+        v = 0;
+      } else if (apProgress === null) {
+        v = -70;
       } else {
-        const ripple = Math.sin((i / sampleCount + sweepOffset) * Math.PI * 7) * 1.4;
-        v = -70 + ripple;
+        const waveT = i / sampleCount - apProgress + 0.18;
+        if (waveT >= 0 && waveT <= 1) {
+          v = actionPotentialValue(waveT);
+        } else {
+          v = -70;
+        }
       }
 
       points.push(`${x.toFixed(1)},${voltageToY(v).toFixed(1)}`);
@@ -1489,14 +1554,25 @@ function setupNerveImpulseMeasurement() {
 
     const tick = () => {
       const recording = inCorrectRecordingState();
-      sweepOffset = (sweepOffset + (recording ? 0.008 : 0.004)) % 1;
+
+      if (recording && apProgress !== null) {
+        apProgress += 0.009;
+        if (apProgress > 1.25) {
+          apProgress = null;
+        }
+      }
+
       renderScopeTrace(recording);
 
       if (recording) {
-        const t = sweepOffset % 1;
-        readout.textContent = `Vm: ${actionPotentialValue(t).toFixed(1)} mV | Time window: 10 ms`;
+        if (apProgress !== null) {
+          const t = Math.max(0, Math.min(1, apProgress));
+          readout.textContent = `Vm: ${actionPotentialValue(t).toFixed(1)} mV | Time window: 10 ms`;
+        } else {
+          readout.textContent = "Vm: -70.0 mV | Resting membrane potential";
+        }
       } else {
-        readout.textContent = "Vm: -- mV | Waiting for valid electrode positions.";
+        readout.textContent = "Vm: 0.0 mV | Place electrodes to begin recording.";
       }
 
       scopeFrame = requestAnimationFrame(tick);
@@ -1509,19 +1585,43 @@ function setupNerveImpulseMeasurement() {
     const recording = inCorrectRecordingState();
     insideDrop.classList.toggle("placed", Boolean(insideDrop.querySelector(".electrode-chip")));
     outsideDrop.classList.toggle("placed", Boolean(outsideDrop.querySelector(".electrode-chip")));
+    stimulateBtn.disabled = !recording;
 
     if (recording) {
-      feedback.textContent = "Recording active: intracellular vs extracellular electrodes are correctly placed.";
+      feedback.textContent = "Recording configured. Click Stimulate Neuron to trigger an action potential.";
       feedback.className = "feedback good";
       return;
     }
+
+    apProgress = null;
 
     feedback.textContent = "Place one electrode inside the axon and the other outside to measure membrane potential.";
     feedback.className = "feedback bad";
   }
 
+  stimulateBtn.addEventListener("click", () => {
+    if (!inCorrectRecordingState()) {
+      feedback.textContent = "Place one electrode inside and one outside before stimulating.";
+      feedback.className = "feedback bad";
+      return;
+    }
+
+    apProgress = 0;
+    feedback.textContent = "Neuron stimulated. Action potential propagating across the oscilloscope trace.";
+    feedback.className = "feedback good";
+  });
+
+  window.addEventListener("resize", () => {
+    updateWires();
+  });
+
+  window.addEventListener("scroll", () => {
+    updateWires();
+  }, { passive: true });
+
   updateMeasurementState();
   renderScopeTrace(false);
+  updateWires();
   startScopeAnimation();
 }
 
