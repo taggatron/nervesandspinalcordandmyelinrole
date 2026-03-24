@@ -102,7 +102,45 @@
 
     <section id="task4" class="card reveal">
       <div class="card-head">
-        <h2>4. Zoomed Saltatory Conduction Animation</h2>
+        <h2>4. Motor vs Sensory Comparison Sort</h2>
+        <p>Drag each statement to Motor, Sensory, or Both.</p>
+      </div>
+
+      <div class="sort-grid">
+        <div>
+          <h3>Statements</h3>
+          <div id="compareBank" class="chips" data-bank="compare"></div>
+        </div>
+
+        <div>
+          <h3>Categories</h3>
+          <div class="category-grid">
+            <div class="category" data-category="motor">
+              <h4>Motor</h4>
+              <div class="drop-list" id="motorDrop"></div>
+            </div>
+            <div class="category" data-category="sensory">
+              <h4>Sensory</h4>
+              <div class="drop-list" id="sensoryDrop"></div>
+            </div>
+            <div class="category" data-category="both">
+              <h4>Both</h4>
+              <div class="drop-list" id="bothDrop"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="button-row">
+        <button id="checkCompare" class="btn">Check Sort</button>
+        <button id="resetCompare" class="btn btn-ghost">Reset</button>
+      </div>
+      <p id="compareFeedback" class="feedback" aria-live="polite"></p>
+    </section>
+
+    <section id="task5" class="card reveal">
+      <div class="card-head">
+        <h2>5. Zoomed Saltatory Conduction Animation</h2>
         <p>Run an impulse along a myelinated axon and observe how it jumps node-to-node.</p>
       </div>
 
@@ -163,44 +201,6 @@
           </p>
         </div>
       </div>
-    </section>
-
-    <section id="task5" class="card reveal">
-      <div class="card-head">
-        <h2>5. Motor vs Sensory Comparison Sort</h2>
-        <p>Drag each statement to Motor, Sensory, or Both.</p>
-      </div>
-
-      <div class="sort-grid">
-        <div>
-          <h3>Statements</h3>
-          <div id="compareBank" class="chips" data-bank="compare"></div>
-        </div>
-
-        <div>
-          <h3>Categories</h3>
-          <div class="category-grid">
-            <div class="category" data-category="motor">
-              <h4>Motor</h4>
-              <div class="drop-list" id="motorDrop"></div>
-            </div>
-            <div class="category" data-category="sensory">
-              <h4>Sensory</h4>
-              <div class="drop-list" id="sensoryDrop"></div>
-            </div>
-            <div class="category" data-category="both">
-              <h4>Both</h4>
-              <div class="drop-list" id="bothDrop"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="button-row">
-        <button id="checkCompare" class="btn">Check Sort</button>
-        <button id="resetCompare" class="btn btn-ghost">Reset</button>
-      </div>
-      <p id="compareFeedback" class="feedback" aria-live="polite"></p>
     </section>
   </main>
 

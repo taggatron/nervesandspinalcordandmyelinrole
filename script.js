@@ -87,7 +87,7 @@ const neuroneData = {
     nodes: [
       { x: 108, y: 182, title: "Cell body", text: "Contains nucleus and organelles for metabolic control." },
       { x: 320, y: 184, title: "Axon", text: "Long projection carrying impulses away from cell body." },
-      { x: 552, y: 180, title: "Myelin sheath", text: "Insulating layers that increase conduction speed." },
+      { x: 552, y: 180, title: "Myelin sheath", text: "Insulating layers that increase conduction speed and stop electrical interference from nearby neurones." },
       { x: 806, y: 182, title: "Axon terminals", text: "Release neurotransmitters at the neuromuscular junction." }
     ]
   },
