@@ -286,6 +286,7 @@ h4 {
   margin-top: 14px;
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .btn {
@@ -297,6 +298,7 @@ h4 {
   border-radius: 10px;
   padding: 10px 14px;
   cursor: pointer;
+  min-height: 42px;
 }
 
 .btn-ghost {
@@ -400,6 +402,7 @@ h4 {
   margin-top: 16px;
   display: flex;
   gap: 8px;
+  flex-wrap: wrap;
 }
 
 .tab-btn {
@@ -676,5 +679,97 @@ h4 {
     min-width: 32px;
     min-height: 32px;
     padding: 1px;
+  }
+
+  .main-layout {
+    padding: 8px 14px 52px;
+    gap: 14px;
+  }
+
+  .hero {
+    margin: 24px auto 10px;
+    padding: 16px 14px;
+  }
+
+  .card {
+    padding: 14px;
+  }
+
+  .card-head h2 {
+    font-size: 1.3rem;
+  }
+
+  .hotspot {
+    font-size: 0.74rem;
+    padding: 5px 8px;
+  }
+
+  .neurone-label-text {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 640px) {
+  .button-row .btn {
+    flex: 1 1 calc(50% - 5px);
+    text-align: center;
+  }
+
+  .tab-btn {
+    padding: 7px 11px;
+    font-size: 0.92rem;
+  }
+
+  .chips {
+    padding: 10px;
+    gap: 7px;
+  }
+
+  .chip {
+    font-size: 0.9rem;
+    padding: 7px 10px;
+  }
+
+  .saltatory-stage {
+    padding: 8px;
+  }
+
+  .salt-label {
+    font-size: 11px;
+  }
+
+  .structure-text,
+  .hero-copy {
+    font-size: 0.96rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .dropzone-wrap {
+    overflow-x: auto;
+    padding-bottom: 4px;
+  }
+
+  .reflex-arc-stage {
+    min-width: 520px;
+  }
+
+  .arc-zone .chip {
+    transform: none;
+    max-width: 84px;
+    white-space: normal;
+    line-height: 1.05;
+    font-size: 10px;
+    border-radius: 8px;
+    padding: 3px 5px;
+    text-align: center;
+  }
+
+  .bg-orb {
+    display: none;
+  }
+
+  .footer {
+    padding: 0 14px;
   }
 }
