@@ -534,6 +534,7 @@ async function setupReflexArcAnimation() {
   const sensoryPath = svg.querySelector("#sensoryImpulsePath");
   const relayPath = svg.querySelector("#relayImpulsePath");
   const motorPath = svg.querySelector("#motorImpulsePath");
+  const quadriceps = svg.querySelector("#quad");
 
   if (!hammer || !impulseDot || !sensoryPath || !relayPath || !motorPath) {
     return;
@@ -582,19 +583,36 @@ async function setupReflexArcAnimation() {
     );
   }
 
+  function contractQuadriceps() {
+    if (!quadriceps) return;
+
+    quadriceps.animate(
+      [
+        { transform: "scaleX(1)", transformOrigin: "center center", transformBox: "fill-box" },
+        { transform: "scaleX(0.9)", transformOrigin: "center center", transformBox: "fill-box", offset: 0.45 },
+        { transform: "scaleX(1)", transformOrigin: "center center", transformBox: "fill-box" }
+      ],
+      { duration: 420, easing: "ease-out" }
+    );
+  }
+
   async function playReflexDemo() {
     if (isAnimating) return;
     isAnimating = true;
     playBtn.textContent = "Animating...";
     playBtn.disabled = true;
 
+    // Keep the pulse marker visually above all SVG elements while animating.
+    svg.appendChild(impulseDot);
+
     strikeHammer();
 
     impulseDot.style.opacity = "1";
     moveDotToPathStart(sensoryPath);
-    await animateAlongPath(sensoryPath, 900);
-    await animateAlongPath(relayPath, 360);
-    await animateAlongPath(motorPath, 820);
+    await animateAlongPath(sensoryPath, 1020);
+    await animateAlongPath(relayPath, 420);
+    await animateAlongPath(motorPath, 940);
+    contractQuadriceps();
 
     impulseDot.animate(
       [
