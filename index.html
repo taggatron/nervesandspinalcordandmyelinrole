@@ -233,6 +233,53 @@
         </div>
       </div>
     </section>
+
+    <section id="task6" class="card reveal">
+      <div class="card-head">
+        <h2>6. Measuring Nerve Impulses</h2>
+        <p>Recreate the Hodgkin and Huxley squid axon recording setup with intracellular and extracellular electrodes.</p>
+      </div>
+
+      <div class="measure-grid">
+        <div class="hh-stage" aria-label="Hodgkin and Huxley experiment setup">
+          <h3>Electrode Placement</h3>
+          <p class="arc-instruction">Drag one electrode into the middle of the squid axon and the other outside the axon.</p>
+
+          <div id="hhElectrodeBank" class="hh-electrode-bank" aria-label="Electrode bank">
+            <div class="electrode-chip" id="electrodeA" data-id="A" draggable="true">Electrode A</div>
+            <div class="electrode-chip" id="electrodeB" data-id="B" draggable="true">Electrode B</div>
+          </div>
+
+          <div class="hh-apparatus">
+            <div class="hh-dropzone hh-outside-zone" id="hhOutsideDrop" data-zone="outside">Outside Axon</div>
+            <div class="hh-axon-shell" aria-hidden="true">
+              <div class="hh-axon-core"></div>
+              <div class="hh-dropzone hh-inside-zone" id="hhInsideDrop" data-zone="inside">Inside Axon</div>
+            </div>
+          </div>
+
+          <p id="hhFeedback" class="feedback" aria-live="polite">Place electrodes to begin recording.</p>
+        </div>
+
+        <div class="hh-scope-panel">
+          <h3>Oscilloscope</h3>
+          <svg id="hhScope" viewBox="0 0 640 280" aria-label="Voltage in millivolts over time">
+            <rect x="50" y="20" width="560" height="220" rx="10" class="hh-scope-bg" />
+            <line x1="50" y1="130" x2="610" y2="130" class="hh-axis" />
+            <line x1="80" y1="20" x2="80" y2="240" class="hh-axis" />
+
+            <text x="20" y="36" class="hh-axis-label">+40</text>
+            <text x="24" y="134" class="hh-axis-label">0</text>
+            <text x="16" y="236" class="hh-axis-label">-90</text>
+            <text x="18" y="254" class="hh-axis-title">mV</text>
+            <text x="560" y="262" class="hh-axis-title">time (ms)</text>
+
+            <polyline id="hhTrace" class="hh-trace" points=""></polyline>
+          </svg>
+          <p id="hhScopeReadout" class="salt-status">Vm: -- mV | Waiting for valid electrode positions.</p>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer class="footer reveal">

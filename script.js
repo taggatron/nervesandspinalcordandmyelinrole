@@ -1354,6 +1354,177 @@ function setupCompareTask() {
   reset();
 }
 
+function setupNerveImpulseMeasurement() {
+  const bank = document.getElementById("hhElectrodeBank");
+  const insideDrop = document.getElementById("hhInsideDrop");
+  const outsideDrop = document.getElementById("hhOutsideDrop");
+  const electrodes = [...document.querySelectorAll(".electrode-chip")];
+  const feedback = document.getElementById("hhFeedback");
+  const trace = document.getElementById("hhTrace");
+  const readout = document.getElementById("hhScopeReadout");
+
+  if (!bank || !insideDrop || !outsideDrop || !electrodes.length || !trace || !readout || !feedback) {
+    return;
+  }
+
+  let draggedId = null;
+  let scopeFrame = null;
+  let sweepOffset = 0;
+
+  electrodes.forEach((el) => {
+    el.addEventListener("dragstart", (event) => {
+      draggedId = el.dataset.id;
+      event.dataTransfer.setData("text/plain", draggedId);
+    });
+  });
+
+  function placeElectrode(dropEl, id) {
+    if (!id) return;
+    const electrode = document.querySelector(`.electrode-chip[data-id="${id}"]`);
+    if (!electrode) return;
+
+    const occupied = dropEl.querySelector(".electrode-chip");
+    if (occupied && occupied.dataset.id !== id) {
+      bank.appendChild(occupied);
+    }
+
+    dropEl.appendChild(electrode);
+    updateMeasurementState();
+  }
+
+  function wireDropzone(dropEl) {
+    dropEl.addEventListener("dragover", (event) => {
+      event.preventDefault();
+      dropEl.classList.add("active");
+    });
+
+    dropEl.addEventListener("dragleave", () => {
+      dropEl.classList.remove("active");
+    });
+
+    dropEl.addEventListener("drop", (event) => {
+      event.preventDefault();
+      dropEl.classList.remove("active");
+      const id = event.dataTransfer.getData("text/plain") || draggedId;
+      placeElectrode(dropEl, id);
+    });
+  }
+
+  wireDropzone(insideDrop);
+  wireDropzone(outsideDrop);
+
+  bank.addEventListener("dragover", (event) => {
+    event.preventDefault();
+    bank.classList.add("active");
+  });
+
+  bank.addEventListener("dragleave", () => {
+    bank.classList.remove("active");
+  });
+
+  bank.addEventListener("drop", (event) => {
+    event.preventDefault();
+    bank.classList.remove("active");
+    const id = event.dataTransfer.getData("text/plain") || draggedId;
+    if (!id) return;
+    const electrode = document.querySelector(`.electrode-chip[data-id="${id}"]`);
+    if (!electrode) return;
+    bank.appendChild(electrode);
+    updateMeasurementState();
+  });
+
+  function inCorrectRecordingState() {
+    const hasInside = Boolean(insideDrop.querySelector(".electrode-chip"));
+    const hasOutside = Boolean(outsideDrop.querySelector(".electrode-chip"));
+    return hasInside && hasOutside;
+  }
+
+  function actionPotentialValue(t) {
+    if (t < 0.12) return -70;
+    if (t < 0.2) return -70 + ((t - 0.12) / 0.08) * 105;
+    if (t < 0.34) return 35 - ((t - 0.2) / 0.14) * 117;
+    if (t < 0.5) return -82 + ((t - 0.34) / 0.16) * 12;
+    return -70;
+  }
+
+  function voltageToY(v) {
+    const minV = -90;
+    const maxV = 40;
+    const clamped = Math.max(minV, Math.min(maxV, v));
+    const normalized = (clamped - minV) / (maxV - minV);
+    return 240 - normalized * 220;
+  }
+
+  function renderScopeTrace(isRecording) {
+    const points = [];
+    const sampleCount = 120;
+
+    for (let i = 0; i <= sampleCount; i += 1) {
+      const x = 80 + (i / sampleCount) * 530;
+      let v;
+
+      if (isRecording) {
+        const t = ((i / sampleCount) + sweepOffset) % 1;
+        v = actionPotentialValue(t);
+      } else {
+        const ripple = Math.sin((i / sampleCount + sweepOffset) * Math.PI * 7) * 1.4;
+        v = -70 + ripple;
+      }
+
+      points.push(`${x.toFixed(1)},${voltageToY(v).toFixed(1)}`);
+    }
+
+    trace.setAttribute("points", points.join(" "));
+  }
+
+  function stopScopeAnimation() {
+    if (scopeFrame) {
+      cancelAnimationFrame(scopeFrame);
+      scopeFrame = null;
+    }
+  }
+
+  function startScopeAnimation() {
+    stopScopeAnimation();
+
+    const tick = () => {
+      const recording = inCorrectRecordingState();
+      sweepOffset = (sweepOffset + (recording ? 0.008 : 0.004)) % 1;
+      renderScopeTrace(recording);
+
+      if (recording) {
+        const t = sweepOffset % 1;
+        readout.textContent = `Vm: ${actionPotentialValue(t).toFixed(1)} mV | Time window: 10 ms`;
+      } else {
+        readout.textContent = "Vm: -- mV | Waiting for valid electrode positions.";
+      }
+
+      scopeFrame = requestAnimationFrame(tick);
+    };
+
+    scopeFrame = requestAnimationFrame(tick);
+  }
+
+  function updateMeasurementState() {
+    const recording = inCorrectRecordingState();
+    insideDrop.classList.toggle("placed", Boolean(insideDrop.querySelector(".electrode-chip")));
+    outsideDrop.classList.toggle("placed", Boolean(outsideDrop.querySelector(".electrode-chip")));
+
+    if (recording) {
+      feedback.textContent = "Recording active: intracellular vs extracellular electrodes are correctly placed.";
+      feedback.className = "feedback good";
+      return;
+    }
+
+    feedback.textContent = "Place one electrode inside the axon and the other outside to measure membrane potential.";
+    feedback.className = "feedback bad";
+  }
+
+  updateMeasurementState();
+  renderScopeTrace(false);
+  startScopeAnimation();
+}
+
 function initRevealOnScroll() {
   const cards = document.querySelectorAll(".card, .hero, .footer");
   const observer = new IntersectionObserver(
@@ -1386,4 +1557,5 @@ setupMicroscopy();
 setupNeurones();
 setupSaltatoryConduction();
 setupCompareTask();
+setupNerveImpulseMeasurement();
 initRevealOnScroll();
