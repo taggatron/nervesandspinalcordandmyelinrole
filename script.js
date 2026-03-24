@@ -1380,6 +1380,7 @@ function setupNerveImpulseMeasurement() {
 
   let draggedId = null;
   let draggingId = null;
+  let mobileDrag = null;
   let scopeFrame = null;
   let apProgress = null;
   let idlePhase = 0;
@@ -1466,6 +1467,94 @@ function setupNerveImpulseMeasurement() {
     });
   }
 
+  function clearDropHighlights() {
+    insideDrop.classList.remove("active");
+    outsideDrop.classList.remove("active");
+    bank.classList.remove("active");
+  }
+
+  function resolveDropTargetFromPoint(clientX, clientY) {
+    const el = document.elementFromPoint(clientX, clientY);
+    if (!el) return null;
+    return el.closest("#hhInsideDrop, #hhOutsideDrop, #hhElectrodeBank");
+  }
+
+  function isMobilePointer(event) {
+    return event.pointerType === "touch" || event.pointerType === "pen" || window.matchMedia("(hover: none) and (pointer: coarse)").matches;
+  }
+
+  function startMobileDrag(event, electrodeEl) {
+    if (!isMobilePointer(event)) return;
+
+    event.preventDefault();
+
+    const rect = electrodeEl.getBoundingClientRect();
+    const ghost = electrodeEl.cloneNode(true);
+    ghost.removeAttribute("id");
+    ghost.style.position = "fixed";
+    ghost.style.left = `${rect.left.toFixed(2)}px`;
+    ghost.style.top = `${rect.top.toFixed(2)}px`;
+    ghost.style.width = `${rect.width.toFixed(2)}px`;
+    ghost.style.zIndex = "2200";
+    ghost.style.pointerEvents = "none";
+    ghost.classList.add("mobile-drag-ghost");
+    document.body.appendChild(ghost);
+
+    draggedId = electrodeEl.dataset.id;
+    draggingId = draggedId;
+
+    mobileDrag = {
+      id: draggedId,
+      source: electrodeEl,
+      ghost,
+      pointerId: event.pointerId,
+      offsetX: event.clientX - rect.left,
+      offsetY: event.clientY - rect.top
+    };
+
+    electrodeEl.style.visibility = "hidden";
+    updateWires({ [draggedId]: toGridPoint(event.clientX, event.clientY) });
+  }
+
+  function moveMobileDrag(event) {
+    if (!mobileDrag) return;
+    event.preventDefault();
+
+    const { ghost, offsetX, offsetY, id } = mobileDrag;
+    ghost.style.left = `${(event.clientX - offsetX).toFixed(2)}px`;
+    ghost.style.top = `${(event.clientY - offsetY).toFixed(2)}px`;
+
+    const target = resolveDropTargetFromPoint(event.clientX, event.clientY);
+    clearDropHighlights();
+    target?.classList.add("active");
+
+    updateWires({ [id]: toGridPoint(event.clientX, event.clientY) });
+  }
+
+  function endMobileDrag(event) {
+    if (!mobileDrag) return;
+
+    const { source, ghost, id } = mobileDrag;
+    const target = resolveDropTargetFromPoint(event.clientX, event.clientY);
+
+    if (target === insideDrop || target === outsideDrop) {
+      placeElectrode(target, id);
+    } else if (target === bank) {
+      bank.appendChild(source);
+      updateMeasurementState();
+      updateWires();
+    } else {
+      updateWires();
+    }
+
+    source.style.visibility = "";
+    ghost.remove();
+    mobileDrag = null;
+    draggingId = null;
+    clearDropHighlights();
+    updateWires();
+  }
+
   electrodes.forEach((el) => {
     el.addEventListener("dragstart", (event) => {
       draggedId = el.dataset.id;
@@ -1484,6 +1573,28 @@ function setupNerveImpulseMeasurement() {
       draggingId = null;
       updateWires();
     });
+
+    el.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse") return;
+      el.setPointerCapture(event.pointerId);
+      startMobileDrag(event, el);
+    });
+
+    el.addEventListener("pointermove", (event) => {
+      if (!mobileDrag || mobileDrag.id !== el.dataset.id || mobileDrag.pointerId !== event.pointerId) return;
+      moveMobileDrag(event);
+    });
+
+    const finishPointerDrag = (event) => {
+      if (!mobileDrag || mobileDrag.id !== el.dataset.id || mobileDrag.pointerId !== event.pointerId) return;
+      endMobileDrag(event);
+      if (el.hasPointerCapture(event.pointerId)) {
+        el.releasePointerCapture(event.pointerId);
+      }
+    };
+
+    el.addEventListener("pointerup", finishPointerDrag);
+    el.addEventListener("pointercancel", finishPointerDrag);
   });
 
   function placeElectrode(dropEl, id) {
