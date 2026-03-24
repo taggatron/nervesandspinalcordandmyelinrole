@@ -535,6 +535,7 @@ async function setupReflexArcAnimation() {
   const relayPath = svg.querySelector("#relayImpulsePath");
   const motorPath = svg.querySelector("#motorImpulsePath");
   const quadriceps = svg.querySelector("#quad, [inkscape\\:label=\"quad\"], #path2");
+  const lowerLegGroup = svg.querySelector("#lowerLegGroup");
 
   if (!hammer || !impulseDot || !sensoryPath || !relayPath || !motorPath) {
     return;
@@ -596,6 +597,19 @@ async function setupReflexArcAnimation() {
     );
   }
 
+  function kickLowerLeg() {
+    if (!lowerLegGroup) return;
+
+    lowerLegGroup.animate(
+      [
+        { transform: "rotate(0deg)", transformOrigin: "0% 0%", transformBox: "fill-box" },
+        { transform: "rotate(-30deg)", transformOrigin: "0% 0%", transformBox: "fill-box", offset: 0.45 },
+        { transform: "rotate(0deg)", transformOrigin: "0% 0%", transformBox: "fill-box" }
+      ],
+      { duration: 560, easing: "cubic-bezier(0.18, 0.78, 0.28, 1)" }
+    );
+  }
+
   async function playReflexDemo() {
     if (isAnimating) return;
     isAnimating = true;
@@ -613,6 +627,7 @@ async function setupReflexArcAnimation() {
     await animateAlongPath(relayPath, 420);
     await animateAlongPath(motorPath, 940);
     contractQuadriceps();
+    kickLowerLeg();
 
     impulseDot.animate(
       [
