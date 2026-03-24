@@ -428,12 +428,12 @@ h4 {
   inset: 0;
   opacity: 0.2;
   filter: grayscale(80%) saturate(0.2) contrast(1.03);
-  transition: opacity 0.7s ease, filter 0.7s ease;
+  transition: opacity 0.45s ease, filter 0.45s ease;
 }
 
 .hotspot.fade-in-target {
   opacity: 0.2;
-  transition: opacity 0.7s ease, transform 0.2s ease, background 0.2s ease;
+  transition: opacity 0.45s ease, transform 0.2s ease, background 0.2s ease;
 }
 
 .hotspot {
@@ -503,7 +503,7 @@ h4 {
   width: 100%;
   height: 2px;
   background: linear-gradient(90deg, transparent, #ffd166, #ff6f3c, transparent);
-  animation: scan 4.5s ease-in-out infinite;
+  animation: scan 3.6s ease-in-out infinite;
   animation-play-state: paused;
   opacity: 0.7;
 }
