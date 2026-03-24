@@ -1151,11 +1151,11 @@ h4 {
 }
 
 .ap-channel-na {
-  left: 132px;
+  left: clamp(72px, 10%, 112px);
 }
 
 .ap-channel-k {
-  right: 132px;
+  right: clamp(72px, 10%, 112px);
 }
 
 .ap-channel-tag {
@@ -1495,11 +1495,11 @@ h4 {
 
 @media (min-width: 1024px) {
   .ap-channel-na {
-    left: 162px;
+    left: clamp(56px, 8%, 96px);
   }
 
   .ap-channel-k {
-    right: 162px;
+    right: clamp(56px, 8%, 96px);
   }
 }
 
@@ -1561,11 +1561,11 @@ h4 {
   }
 
   .ap-channel-na {
-    left: 72px;
+    left: 68px;
   }
 
   .ap-channel-k {
-    right: 72px;
+    right: 68px;
   }
 }
 
