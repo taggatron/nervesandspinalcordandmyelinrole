@@ -1,6 +1,6 @@
 const reflexItems = [
   { id: "stimulus", text: "Stimulus", target: "stimulus" },
-  { id: "receptor", text: "Receptor (muscle spindle)", target: "receptor" },
+  { id: "receptor", text: "Receptor", target: "receptor" },
   { id: "sensory", text: "Sensory neurone", target: "sensory" },
   { id: "relay", text: "Relay neurone", target: "relay" },
   { id: "motor", text: "Motor neurone", target: "motor" },
@@ -552,12 +552,14 @@ async function setupReflexArcAnimation() {
   const motorPath = svg.querySelector("#motorImpulsePath");
   const quadriceps = svg.querySelector("#quad, [inkscape\\:label=\"quad\"], #path2");
   const lowerLegGroup = svg.querySelector("#lowerLegGroup");
+  const patella = svg.querySelector("#circle5");
 
   if (!hammer || !impulseDot || !sensoryPath || !relayPath || !motorPath) {
     return;
   }
 
   let isAnimating = false;
+  let lowerLegRaf = null;
 
   function moveDotToPathStart(path) {
     const start = path.getPointAtLength(0);
@@ -616,14 +618,48 @@ async function setupReflexArcAnimation() {
   function kickLowerLeg() {
     if (!lowerLegGroup) return;
 
-    lowerLegGroup.animate(
-      [
-        { transform: "rotate(0deg)", transformOrigin: "0% 0%", transformBox: "fill-box" },
-        { transform: "rotate(-30deg)", transformOrigin: "0% 0%", transformBox: "fill-box", offset: 0.45 },
-        { transform: "rotate(0deg)", transformOrigin: "0% 0%", transformBox: "fill-box" }
-      ],
-      { duration: 560, easing: "cubic-bezier(0.18, 0.78, 0.28, 1)" }
-    );
+    const baseTransform = lowerLegGroup.getAttribute("transform") || "";
+    const pivotX = patella ? Number(patella.getAttribute("cx")) : 571.41;
+    const pivotY = patella ? Number(patella.getAttribute("cy")) : 231.02;
+
+    if (!Number.isFinite(pivotX) || !Number.isFinite(pivotY)) {
+      return;
+    }
+
+    if (lowerLegRaf) {
+      cancelAnimationFrame(lowerLegRaf);
+      lowerLegRaf = null;
+    }
+
+    const duration = 400;
+    const maxKickDeg = -30;
+    const split = 0.45;
+    const startTime = performance.now();
+
+    const easeInOut = (t) => 0.5 - 0.5 * Math.cos(Math.PI * t);
+
+    const tick = (now) => {
+      const t = Math.min(1, (now - startTime) / duration);
+      let angle;
+
+      if (t <= split) {
+        angle = maxKickDeg * easeInOut(t / split);
+      } else {
+        angle = maxKickDeg * (1 - easeInOut((t - split) / (1 - split)));
+      }
+
+      const kickTransform = `${baseTransform} rotate(${angle.toFixed(2)} ${pivotX.toFixed(2)} ${pivotY.toFixed(2)})`.trim();
+      lowerLegGroup.setAttribute("transform", kickTransform);
+
+      if (t < 1) {
+        lowerLegRaf = requestAnimationFrame(tick);
+      } else {
+        lowerLegGroup.setAttribute("transform", baseTransform);
+        lowerLegRaf = null;
+      }
+    };
+
+    lowerLegRaf = requestAnimationFrame(tick);
   }
 
   async function playReflexDemo() {
