@@ -2012,3 +2012,202 @@ h4 {
     padding: 0 14px;
   }
 }
+
+@media (max-width: 768px) {
+  body {
+    font-size: 15px;
+  }
+
+  .hero-copy,
+  .structure-text,
+  .legend,
+  .salt-status,
+  #hhScopeReadout,
+  #apStatus {
+    font-size: 0.94rem;
+  }
+
+  .btn {
+    min-height: 44px;
+    padding: 10px 12px;
+    font-size: 0.92rem;
+  }
+
+  .tab-btn,
+  .chip,
+  .electrode-chip,
+  .hotspot {
+    font-size: 0.82rem;
+  }
+
+  .card {
+    border-radius: 14px;
+  }
+
+  .neurone-stage,
+  .saltatory-stage,
+  .ap-stage,
+  .ap-panel,
+  .hh-stage,
+  .hh-scope-panel,
+  .structure-panel {
+    border-radius: 12px;
+  }
+
+  .hh-axis-label,
+  .hh-axis-title,
+  .ap-trace-label,
+  .ap-trace-title {
+    font-size: 10px;
+  }
+
+  #hhWireLayer,
+  .hh-jack {
+    display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: clamp(1.58rem, 8.5vw, 2.05rem);
+    line-height: 1.12;
+  }
+
+  .card-head h2 {
+    font-size: 1.12rem;
+  }
+
+  .reflex-grid,
+  .sort-grid,
+  .microscopy-grid,
+  .saltatory-grid,
+  .measure-grid,
+  .ap-grid {
+    gap: 12px;
+  }
+
+  .arc-zone {
+    width: 29px;
+    height: 29px;
+    min-width: 29px;
+    min-height: 29px;
+  }
+
+  .arc-zone .chip {
+    max-width: 74px;
+    font-size: 9px;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+
+  .ap-node-model {
+    --ap-na-left: 52px;
+    --ap-k-right: 52px;
+    min-height: 270px;
+    padding: 16px 10px;
+  }
+
+  .ap-channel {
+    width: 66px;
+    height: 98px;
+    top: calc(50% - 54px);
+  }
+
+  .ap-channel-callout {
+    font-size: 0.56rem;
+    top: -40px;
+  }
+
+  .ap-channel-callout::after {
+    height: 16px;
+  }
+
+  .ap-pump {
+    width: 140px;
+    height: 92px;
+    top: calc(50% - 50px);
+  }
+
+  .ap-pump-label {
+    font-size: 0.84rem;
+  }
+
+  .ap-ion,
+  .ap-random-ion,
+  .ap-threshold-na,
+  .ap-pump-ion {
+    font-size: 0.66rem;
+  }
+
+  .ap-charge {
+    width: 25px;
+    height: 25px;
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 400px) {
+  .main-layout {
+    padding: 4px 8px 30px;
+  }
+
+  .hero {
+    padding: 14px 10px;
+  }
+
+  .card {
+    padding: 10px 8px;
+  }
+
+  .button-row {
+    gap: 8px;
+  }
+
+  .chips,
+  .drop-list,
+  .drop-slot,
+  .hh-electrode-bank {
+    padding: 8px;
+  }
+
+  .salt-label {
+    font-size: 9.5px;
+  }
+
+  .hotspot {
+    font-size: 0.7rem;
+    padding: 4px 7px;
+  }
+}
+
+@media (max-width: 640px) {
+  .reveal {
+    animation-duration: 0.55s;
+    transform: translateY(8px);
+  }
+
+  .scan-line {
+    animation-duration: 4.8s;
+  }
+
+  .arc-zone .chip.correct-placed,
+  #checkCompare.compare-correct {
+    animation-duration: 1.8s;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+  }
+}
