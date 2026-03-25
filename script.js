@@ -2281,6 +2281,20 @@ function setupActionPotentials() {
     diffusionTimer = setInterval(stepDiffusion, 220);
   }
 
+  function rebalanceForRestingPotential() {
+    diffusionStates.forEach((state) => {
+      if (state.crossing) return;
+
+      const targetSide = state.type === "na" ? "outside" : "inside";
+      state.side = targetSide;
+
+      const bounds = getDiffusionBounds(state.type, targetSide);
+      state.x = randomBetween(bounds.minX, bounds.maxX);
+      state.y = randomBetween(bounds.minY, bounds.maxY);
+      applyIonPosition(state);
+    });
+  }
+
   function getRandomIonBounds(kind) {
     const naChannelLeft = model.clientWidth * 0.2;
     const kChannelRight = model.clientWidth * 0.78;
@@ -2373,6 +2387,10 @@ function setupActionPotentials() {
       startRandomIonMotion();
     } else {
       stopRandomIonMotion();
+    }
+
+    if (phase.id === "resting") {
+      rebalanceForRestingPotential();
     }
   }
 
