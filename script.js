@@ -2016,6 +2016,7 @@ function setupActionPotentials() {
   const model = document.getElementById("apNodeModel");
   const naChannel = document.getElementById("apNaChannel");
   const kChannel = document.getElementById("apKChannel");
+  const pump = document.getElementById("apPump");
   const phaseLabel = document.getElementById("apPhaseLabel");
   const status = document.getElementById("apStatus");
   const phaseList = document.getElementById("apPhaseList");
@@ -2029,7 +2030,7 @@ function setupActionPotentials() {
   const diffusionIons = [...model.querySelectorAll(".ap-ion")];
   const randomIons = [...model.querySelectorAll(".ap-random-ion")];
 
-  if (!model || !naChannel || !kChannel || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn || !traceBase || !traceMarker || !chargeOut || !chargeIn) {
+  if (!model || !naChannel || !kChannel || !pump || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn || !traceBase || !traceMarker || !chargeOut || !chargeIn) {
     return;
   }
 
@@ -2072,13 +2073,16 @@ function setupActionPotentials() {
   let timer = null;
   let diffusionTimer = null;
   let randomIonTimer = null;
+  let pumpTimer = null;
   const crossingTimers = new Set();
+  const pumpTransitTimers = new Set();
 
   const diffusionStates = diffusionIons.map((ion) => ({
     el: ion,
     type: ion.classList.contains("ap-ion-na") ? "na" : "k",
     side: ion.classList.contains("ap-ion-na") ? "outside" : "inside",
     crossing: false,
+    pumping: false,
     x: ion.offsetLeft,
     y: ion.offsetTop
   }));
@@ -2211,6 +2215,11 @@ function setupActionPotentials() {
     crossingTimers.clear();
   }
 
+  function clearPumpTransitTimers() {
+    pumpTransitTimers.forEach((id) => clearTimeout(id));
+    pumpTransitTimers.clear();
+  }
+
   function startChannelCrossing(state, channelEl, destinationSide) {
     if (state.crossing) return;
 
@@ -2250,7 +2259,7 @@ function setupActionPotentials() {
     const naCrossChance = phaseId === "depolarization" ? 0.22 : 0;
 
     diffusionStates.forEach((state) => {
-      if (state.crossing) return;
+      if (state.crossing || state.pumping) return;
 
       const bounds = getDiffusionBounds(state.type, state.side);
       state.x = clamp(state.x + randomBetween(-7, 7), bounds.minX, bounds.maxX);
@@ -2281,11 +2290,130 @@ function setupActionPotentials() {
     diffusionTimer = setInterval(stepDiffusion, 220);
   }
 
-  function rebalanceForRestingPotential() {
-    diffusionStates.forEach((state) => {
-      if (state.crossing) return;
+  function getPumpBounds() {
+    const pumpRect = pump.getBoundingClientRect();
+    const modelRect = model.getBoundingClientRect();
+    return {
+      left: pumpRect.left - modelRect.left,
+      right: pumpRect.right - modelRect.left,
+      top: pumpRect.top - modelRect.top,
+      bottom: pumpRect.bottom - modelRect.top,
+      centerX: pumpRect.left - modelRect.left + pumpRect.width / 2
+    };
+  }
 
-      const targetSide = state.type === "na" ? "outside" : "inside";
+  function pickTransportIons(type, side, count) {
+    const candidates = diffusionStates.filter((state) => state.type === type && state.side === side && !state.crossing && !state.pumping);
+    for (let i = candidates.length - 1; i > 0; i -= 1) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [candidates[i], candidates[j]] = [candidates[j], candidates[i]];
+    }
+    return candidates.slice(0, count);
+  }
+
+  function queuePumpPhase(cb, delay) {
+    const id = setTimeout(() => {
+      cb();
+      pumpTransitTimers.delete(id);
+    }, delay);
+    pumpTransitTimers.add(id);
+  }
+
+  function runPumpTransportCycle() {
+    if (!(phaseId === "resting" || phaseId === "recovery")) return;
+
+    const naToMove = pickTransportIons("na", "inside", 3);
+    const kToMove = pickTransportIons("k", "outside", 2);
+
+    if (naToMove.length < 3 || kToMove.length < 2) return;
+
+    const bounds = getPumpBounds();
+    const naIntakeY = bounds.bottom - 10;
+    const naReleaseY = bounds.top - 20;
+    const kIntakeY = bounds.top + 8;
+    const kReleaseY = bounds.bottom + 18;
+
+    naToMove.forEach((state, idx) => {
+      state.pumping = true;
+      state.crossing = true;
+      state.x = bounds.centerX - 20 + idx * 12;
+      state.y = naIntakeY;
+      applyIonPosition(state);
+    });
+
+    kToMove.forEach((state, idx) => {
+      state.pumping = true;
+      state.crossing = true;
+      state.x = bounds.centerX - 8 + idx * 16;
+      state.y = kIntakeY;
+      applyIonPosition(state);
+    });
+
+    queuePumpPhase(() => {
+      naToMove.forEach((state, idx) => {
+        const outBounds = getDiffusionBounds("na", "outside");
+        state.x = clamp(bounds.centerX - 24 + idx * 12, outBounds.minX, outBounds.maxX);
+        state.y = clamp(naReleaseY, outBounds.minY, outBounds.maxY);
+        applyIonPosition(state);
+      });
+
+      kToMove.forEach((state, idx) => {
+        const inBounds = getDiffusionBounds("k", "inside");
+        state.x = clamp(bounds.centerX - 8 + idx * 16, inBounds.minX, inBounds.maxX);
+        state.y = clamp(kReleaseY, inBounds.minY, inBounds.maxY);
+        applyIonPosition(state);
+      });
+    }, 220);
+
+    queuePumpPhase(() => {
+      naToMove.forEach((state) => {
+        state.side = "outside";
+        state.crossing = false;
+        state.pumping = false;
+      });
+
+      kToMove.forEach((state) => {
+        state.side = "inside";
+        state.crossing = false;
+        state.pumping = false;
+      });
+    }, 620);
+  }
+
+  function stopPumpTransport() {
+    if (pumpTimer) {
+      clearInterval(pumpTimer);
+      pumpTimer = null;
+    }
+    clearPumpTransitTimers();
+    diffusionStates.forEach((state) => {
+      state.pumping = false;
+    });
+  }
+
+  function startPumpTransport() {
+    stopPumpTransport();
+    runPumpTransportCycle();
+    pumpTimer = setInterval(runPumpTransportCycle, 1200);
+  }
+
+  function rebalanceForRestingPotential() {
+    const naOutsideGoal = Math.max(5, Math.floor(diffusionStates.filter((s) => s.type === "na").length * 0.7));
+    const kInsideGoal = Math.max(3, Math.floor(diffusionStates.filter((s) => s.type === "k").length * 0.6));
+    let naOutsideCount = 0;
+    let kInsideCount = 0;
+
+    diffusionStates.forEach((state) => {
+      if (state.crossing || state.pumping) return;
+
+      let targetSide;
+      if (state.type === "na") {
+        targetSide = naOutsideCount < naOutsideGoal ? "outside" : "inside";
+        if (targetSide === "outside") naOutsideCount += 1;
+      } else {
+        targetSide = kInsideCount < kInsideGoal ? "inside" : "outside";
+        if (targetSide === "inside") kInsideCount += 1;
+      }
       state.side = targetSide;
 
       const bounds = getDiffusionBounds(state.type, targetSide);
@@ -2385,8 +2513,10 @@ function setupActionPotentials() {
     const pumpActive = phase.id === "resting" || phase.id === "recovery";
     if (pumpActive) {
       startRandomIonMotion();
+      startPumpTransport();
     } else {
       stopRandomIonMotion();
+      stopPumpTransport();
     }
 
     if (phase.id === "resting") {
@@ -2459,6 +2589,7 @@ function setupActionPotentials() {
   });
 
   window.addEventListener("beforeunload", () => {
+    stopPumpTransport();
     stopDiffusionMotion();
     stopRandomIonMotion();
   });

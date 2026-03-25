@@ -1329,7 +1329,8 @@ h4 {
   font-weight: 800;
   padding: 2px 6px;
   border-radius: 999px;
-  opacity: 0.25;
+  opacity: 0;
+  animation: none;
 }
 
 .ap-pump-ion-na {
