@@ -341,6 +341,11 @@
             <span class="ap-ion ap-ion-k ap-ion-k-1" aria-hidden="true">K+</span>
             <span class="ap-ion ap-ion-k ap-ion-k-2" aria-hidden="true">K+</span>
 
+            <span class="ap-threshold-spark ap-threshold-spark-1" aria-hidden="true">&#9889;</span>
+            <span class="ap-threshold-spark ap-threshold-spark-2" aria-hidden="true">&#9889;</span>
+            <span class="ap-threshold-na ap-threshold-na-1" aria-hidden="true">Na+</span>
+            <span class="ap-threshold-na ap-threshold-na-2" aria-hidden="true">Na+</span>
+
             <div class="ap-charge ap-charge-out" aria-hidden="true">+</div>
             <div class="ap-charge ap-charge-in" aria-hidden="true">-</div>
           </div>
@@ -370,6 +375,7 @@
 
               <polyline id="apTraceBase" class="ap-trace-base" points=""></polyline>
               <polyline id="apTraceSeg-resting" class="ap-trace-seg" points=""></polyline>
+              <polyline id="apTraceSeg-threshold" class="ap-trace-seg" points=""></polyline>
               <polyline id="apTraceSeg-depolarization" class="ap-trace-seg" points=""></polyline>
               <polyline id="apTraceSeg-repolarization" class="ap-trace-seg" points=""></polyline>
               <polyline id="apTraceSeg-hyperpolarization" class="ap-trace-seg" points=""></polyline>
@@ -379,11 +385,12 @@
           </div>
 
           <ol class="ap-phase-list" id="apPhaseList" aria-label="Action potential phases">
-            <li data-phase="resting" class="active">Resting potential</li>
-            <li data-phase="depolarization">Depolarization (Na+ channels open)</li>
-            <li data-phase="repolarization">Repolarization (K+ channels open)</li>
-            <li data-phase="hyperpolarization">Hyperpolarization</li>
-            <li data-phase="recovery">Recovery (ATPase reset)</li>
+            <li data-phase="resting" class="active">Resting potential <span class="ap-phase-mv">-70 mV</span></li>
+            <li data-phase="threshold">Threshold potential <span class="ap-phase-mv">-55 mV</span></li>
+            <li data-phase="depolarization">Depolarization (Na+ channels open) <span class="ap-phase-mv">-55 to +35 mV</span></li>
+            <li data-phase="repolarization">Repolarization (K+ channels open) <span class="ap-phase-mv">+35 to -82 mV</span></li>
+            <li data-phase="hyperpolarization">Hyperpolarization <span class="ap-phase-mv">around -82 mV</span></li>
+            <li data-phase="recovery">Recovery (ATPase reset) <span class="ap-phase-mv">returns to -70 mV</span></li>
           </ol>
         </div>
       </div>

@@ -2036,6 +2036,11 @@ function setupActionPotentials() {
       text: "Voltage-gated Na+ and K+ channels are closed. Na+/K+ ATPase maintains ion gradients."
     },
     {
+      id: "threshold",
+      label: "Threshold potential",
+      text: "Small depolarizing inputs bring the membrane toward threshold. Some Na+ begins diffusing in near the Na+ channel."
+    },
+    {
       id: "depolarization",
       label: "Depolarization",
       text: "Voltage-gated Na+ channels open. Na+ rushes into the axon at this node of Ranvier."
@@ -2063,9 +2068,10 @@ function setupActionPotentials() {
 
   function actionPotentialValue(t) {
     if (t < 0.12) return -70;
-    if (t < 0.2) return -70 + ((t - 0.12) / 0.08) * 105;
-    if (t < 0.34) return 35 - ((t - 0.2) / 0.14) * 117;
-    if (t < 0.5) return -82 + ((t - 0.34) / 0.16) * 12;
+    if (t < 0.2) return -70 + ((t - 0.12) / 0.08) * 15;
+    if (t < 0.28) return -55 + ((t - 0.2) / 0.08) * 90;
+    if (t < 0.42) return 35 - ((t - 0.28) / 0.14) * 117;
+    if (t < 0.58) return -82 + ((t - 0.42) / 0.16) * 12;
     return -70;
   }
 
@@ -2092,14 +2098,16 @@ function setupActionPotentials() {
 
   const segmentRanges = {
     resting: [0, 0.12],
-    depolarization: [0.12, 0.2],
-    repolarization: [0.2, 0.34],
-    hyperpolarization: [0.34, 0.5],
-    recovery: [0.5, 1]
+    threshold: [0.12, 0.2],
+    depolarization: [0.2, 0.28],
+    repolarization: [0.28, 0.42],
+    hyperpolarization: [0.42, 0.58],
+    recovery: [0.58, 1]
   };
 
   const chargeByPhase = {
     resting: { out: "+", in: "-" },
+    threshold: { out: "+", in: "-" },
     depolarization: { out: "-", in: "+" },
     repolarization: { out: "+", in: "-" },
     hyperpolarization: { out: "+", in: "-" },

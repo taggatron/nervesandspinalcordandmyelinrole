@@ -1152,6 +1152,31 @@ h4 {
   justify-content: center;
 }
 
+.ap-channel::before {
+  content: "";
+  position: absolute;
+  inset: 14px 28px;
+  border-radius: 999px;
+  background: linear-gradient(180deg, #e8eef7, #c7d2e3);
+  box-shadow: inset 0 0 0 1px rgba(34, 58, 96, 0.16);
+}
+
+.ap-channel::after {
+  content: "closed";
+  position: absolute;
+  right: -6px;
+  top: -12px;
+  font-size: 0.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #203754;
+  background: rgba(214, 226, 241, 0.95);
+  border: 1px solid rgba(63, 89, 126, 0.42);
+  border-radius: 999px;
+  padding: 2px 6px;
+}
+
 .ap-channel-na {
   left: var(--ap-na-left);
 }
@@ -1197,11 +1222,43 @@ h4 {
 
 .ap-gate {
   position: absolute;
-  inset: 10px 28px;
+  inset: 14px 28px;
   border-radius: 999px;
-  background: rgba(43, 61, 90, 0.86);
+  background: transparent;
   transform-origin: center;
   transition: transform 0.35s ease, opacity 0.35s ease;
+}
+
+.ap-gate::before,
+.ap-gate::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(180deg, #2f4569, #233652);
+  box-shadow: inset 0 0 0 1px rgba(12, 24, 44, 0.26);
+  transition: transform 0.35s ease;
+}
+
+.ap-gate::before {
+  left: 0;
+  border-radius: 999px 0 0 999px;
+}
+
+.ap-gate::after {
+  right: 0;
+  border-radius: 0 999px 999px 0;
+}
+
+.ap-channel-na .ap-gate::before,
+.ap-channel-na .ap-gate::after {
+  background: linear-gradient(180deg, #2f4671, #213757);
+}
+
+.ap-channel-k .ap-gate::before,
+.ap-channel-k .ap-gate::after {
+  background: linear-gradient(180deg, #2b4f58, #1e3e45);
 }
 
 .ap-pump {
@@ -1277,6 +1334,39 @@ h4 {
 .ap-ion-k-1 { bottom: 52px; right: calc(var(--ap-k-right) + 40px); }
 .ap-ion-k-2 { bottom: 42px; right: calc(var(--ap-k-right) + 16px); }
 
+.ap-threshold-spark,
+.ap-threshold-na {
+  position: absolute;
+  left: 16px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.ap-threshold-spark {
+  top: 58px;
+  font-size: 1rem;
+  color: #f09b26;
+  text-shadow: 0 0 8px rgba(255, 198, 73, 0.6);
+}
+
+.ap-threshold-spark-2 {
+  top: 92px;
+}
+
+.ap-threshold-na {
+  top: 74px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #123f91;
+  background: rgba(47, 117, 255, 0.2);
+  border-radius: 999px;
+  padding: 3px 7px;
+}
+
+.ap-threshold-na-2 {
+  top: 106px;
+}
+
 .ap-charge {
   position: absolute;
   width: 30px;
@@ -1318,9 +1408,66 @@ h4 {
   opacity: 1;
 }
 
-.ap-node-model.phase-depolarization .ap-channel-na,
-.ap-node-model.phase-repolarization .ap-channel-k {
-  box-shadow: inset 0 0 0 2px rgba(255, 215, 102, 0.72), 0 0 16px rgba(255, 208, 77, 0.5);
+.ap-node-model.phase-resting .ap-pump {
+  animation: pump-resting 1.6s ease-in-out infinite;
+}
+
+.ap-node-model.phase-resting .ap-pump-ion-na {
+  animation: ap-pump-na-flow 1.8s ease-in-out infinite;
+  opacity: 0.82;
+}
+
+.ap-node-model.phase-resting .ap-pump-ion-k {
+  animation: ap-pump-k-flow 1.8s ease-in-out infinite;
+  opacity: 0.82;
+}
+
+.ap-node-model.phase-threshold .ap-channel-na {
+  box-shadow: inset 0 0 0 2px rgba(97, 170, 255, 0.6), 0 0 16px rgba(96, 164, 245, 0.38);
+}
+
+.ap-node-model.phase-threshold .ap-channel-na::after,
+.ap-node-model.phase-depolarization .ap-channel-na::after,
+.ap-node-model.phase-repolarization .ap-channel-k::after,
+.ap-node-model.phase-hyperpolarization .ap-channel-k::after {
+  content: "open";
+  color: #0f4f2f;
+  background: rgba(197, 246, 219, 0.96);
+  border-color: rgba(21, 133, 79, 0.52);
+}
+
+.ap-node-model.phase-threshold .ap-channel-na .ap-gate {
+  opacity: 1;
+}
+
+.ap-node-model.phase-threshold .ap-channel-na .ap-gate::before {
+  transform: translateX(-48%);
+}
+
+.ap-node-model.phase-threshold .ap-channel-na .ap-gate::after {
+  transform: translateX(48%);
+}
+
+.ap-node-model.phase-threshold .ap-threshold-spark {
+  opacity: 1;
+  animation: ap-threshold-spark-in 1.2s ease-in-out infinite;
+}
+
+.ap-node-model.phase-threshold .ap-threshold-spark-2 {
+  animation-delay: 0.35s;
+}
+
+.ap-node-model.phase-threshold .ap-threshold-na {
+  opacity: 1;
+  animation: ap-threshold-na-in 1.4s ease-in-out infinite;
+}
+
+.ap-node-model.phase-threshold .ap-threshold-na-2 {
+  animation-delay: 0.4s;
+}
+
+.ap-node-model.phase-threshold .ap-ion-na {
+  transform: translate(10px, 34px);
 }
 
 .ap-node-model.phase-depolarization .ap-channel-na .ap-open-indicator {
@@ -1338,8 +1485,25 @@ h4 {
 
 .ap-node-model.phase-depolarization .ap-channel-na .ap-gate,
 .ap-node-model.phase-repolarization .ap-channel-k .ap-gate {
-  transform: scaleY(0.2);
-  opacity: 0.25;
+  opacity: 1;
+}
+
+.ap-node-model.phase-depolarization .ap-channel-na .ap-gate::before,
+.ap-node-model.phase-repolarization .ap-channel-k .ap-gate::before,
+.ap-node-model.phase-hyperpolarization .ap-channel-k .ap-gate::before {
+  transform: translateX(-96%);
+}
+
+.ap-node-model.phase-depolarization .ap-channel-na .ap-gate::after,
+.ap-node-model.phase-repolarization .ap-channel-k .ap-gate::after,
+.ap-node-model.phase-hyperpolarization .ap-channel-k .ap-gate::after {
+  transform: translateX(96%);
+}
+
+.ap-node-model.phase-depolarization .ap-channel-na,
+.ap-node-model.phase-repolarization .ap-channel-k,
+.ap-node-model.phase-hyperpolarization .ap-channel-k {
+  box-shadow: inset 0 0 0 2px rgba(255, 215, 102, 0.72), 0 0 16px rgba(255, 208, 77, 0.5);
 }
 
 .ap-node-model.phase-depolarization .ap-ion-na {
@@ -1385,20 +1549,17 @@ h4 {
 }
 
 .ap-node-model.phase-resting .ap-pump-ion {
-  opacity: 0.55;
-}
-
-.ap-node-model.phase-resting .ap-pump-ion-na {
-  animation: ap-pump-idle 1.7s ease-in-out infinite;
-}
-
-.ap-node-model.phase-resting .ap-pump-ion-k {
-  animation: ap-pump-idle 1.7s ease-in-out infinite reverse;
+  opacity: 0.82;
 }
 
 @keyframes pump-pulse {
   0%, 100% { transform: translateX(-50%) scale(1); }
   50% { transform: translateX(-50%) scale(1.04); }
+}
+
+@keyframes pump-resting {
+  0%, 100% { transform: translateX(-50%) scale(1); }
+  50% { transform: translateX(-50%) scale(1.02); }
 }
 
 @keyframes ap-pump-na-flow {
@@ -1413,16 +1574,39 @@ h4 {
   100% { transform: translate(-22px, 18px) scale(0.95); opacity: 0.1; }
 }
 
-@keyframes ap-pump-idle {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
-}
-
 @keyframes ap-charge-swap {
   0% { transform: scale(1) rotateY(0deg); }
   45% { transform: scale(0.68) rotateY(90deg); }
   55% { transform: scale(0.68) rotateY(90deg); }
   100% { transform: scale(1) rotateY(0deg); }
+}
+
+@keyframes ap-threshold-spark-in {
+  0% {
+    transform: translate(-26px, -6px) scale(0.7);
+    opacity: 0;
+  }
+  38% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(108px, 8px) scale(1.05);
+    opacity: 0;
+  }
+}
+
+@keyframes ap-threshold-na-in {
+  0% {
+    transform: translate(-22px, -2px) scale(0.85);
+    opacity: 0;
+  }
+  36% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(124px, 72px) scale(1);
+    opacity: 0;
+  }
 }
 
 @keyframes ap-na-open-spark {
@@ -1514,15 +1698,30 @@ h4 {
 
 .ap-phase-list li {
   margin: 6px 0;
-  padding: 3px 4px;
+  padding: 3px 8px 3px 4px;
   border-radius: 7px;
   transition: background 0.2s ease, color 0.2s ease;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 14px;
 }
 
 .ap-phase-list li.active {
   background: rgba(47, 117, 255, 0.16);
   color: #1d4f96;
   font-weight: 700;
+}
+
+.ap-phase-mv {
+  color: #35547a;
+  font-size: 0.84rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.ap-phase-list li.active .ap-phase-mv {
+  color: #143f81;
 }
 
 .category-grid {
