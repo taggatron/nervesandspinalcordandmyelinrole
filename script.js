@@ -2371,7 +2371,7 @@ function setupActionPotentials() {
         setIonTransportVisibility(state, true);
         applyIonPosition(state);
       });
-    }, 220);
+    }, 900);
 
     queuePumpPhase(() => {
       naToMove.forEach((state) => {
@@ -2385,7 +2385,7 @@ function setupActionPotentials() {
         state.crossing = false;
         state.pumping = false;
       });
-    }, 620);
+    }, 2200);
   }
 
   function stopPumpTransport() {
@@ -2403,7 +2403,7 @@ function setupActionPotentials() {
   function startPumpTransport() {
     stopPumpTransport();
     runPumpTransportCycle();
-    pumpTimer = setInterval(runPumpTransportCycle, 1200);
+    pumpTimer = setInterval(runPumpTransportCycle, 3000);
   }
 
   function rebalanceForRestingPotential() {

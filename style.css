@@ -1480,17 +1480,17 @@ h4 {
 }
 
 .ap-node-model.phase-resting .ap-pump {
-  animation: pump-resting 1.6s ease-in-out infinite;
+  animation: none;
 }
 
 .ap-node-model.phase-resting .ap-pump-ion-na {
-  animation: ap-pump-na-flow 1.8s ease-in-out infinite;
-  opacity: 0.82;
+  animation: none;
+  opacity: 0;
 }
 
 .ap-node-model.phase-resting .ap-pump-ion-k {
-  animation: ap-pump-k-flow 1.8s ease-in-out infinite;
-  opacity: 0.82;
+  animation: none;
+  opacity: 0;
 }
 
 .ap-node-model.phase-threshold .ap-channel-na {
@@ -1584,27 +1584,27 @@ h4 {
 }
 
 .ap-node-model.phase-recovery .ap-pump {
-  animation: pump-pulse 0.8s ease-in-out infinite;
+  animation: none;
 }
 
 .ap-node-model.phase-recovery .ap-pump-ion-na {
-  animation: ap-pump-na-flow 1.1s ease-in-out infinite;
-  opacity: 0.95;
+  animation: none;
+  opacity: 0;
 }
 
 .ap-node-model.phase-depolarization .ap-pump-ion-na {
   animation: none;
-  opacity: 0.64;
+  opacity: 0;
 }
 
 .ap-node-model.phase-repolarization .ap-pump-ion-k,
 .ap-node-model.phase-recovery .ap-pump-ion-k {
-  animation: ap-pump-k-flow 1.1s ease-in-out infinite;
-  opacity: 0.95;
+  animation: none;
+  opacity: 0;
 }
 
 .ap-node-model.phase-resting .ap-pump-ion {
-  opacity: 0.82;
+  opacity: 0;
 }
 
 .ap-node-model.phase-resting .ap-random-ion,
