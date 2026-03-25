@@ -1354,7 +1354,7 @@ h4 {
   font-weight: 800;
   padding: 3px 7px;
   border-radius: 999px;
-  transition: transform 0.45s ease, opacity 0.45s ease;
+  transition: left 0.3s ease-in-out, top 0.3s ease-in-out, opacity 0.35s ease;
 }
 
 .ap-ion-na {
@@ -1367,11 +1367,17 @@ h4 {
   background: rgba(15, 157, 88, 0.2);
 }
 
-.ap-ion-na-1 { top: 44px; left: calc(var(--ap-na-left) + 8px); }
-.ap-ion-na-2 { top: 58px; left: calc(var(--ap-na-left) + 26px); }
-.ap-ion-na-3 { top: 48px; left: calc(var(--ap-na-left) + 46px); }
-.ap-ion-k-1 { bottom: 52px; right: calc(var(--ap-k-right) + 40px); }
-.ap-ion-k-2 { bottom: 42px; right: calc(var(--ap-k-right) + 16px); }
+.ap-ion-na-1 { top: 44px; left: calc(var(--ap-na-left) + 24px); }
+.ap-ion-na-2 { top: 58px; left: calc(var(--ap-na-left) + 34px); }
+.ap-ion-na-3 { top: 48px; left: calc(var(--ap-na-left) + 44px); }
+.ap-ion-na-4 { top: 70px; left: calc(var(--ap-na-left) + 18px); }
+.ap-ion-na-5 { top: 34px; left: calc(var(--ap-na-left) + 52px); }
+.ap-ion-na-6 { top: 82px; left: calc(var(--ap-na-left) + 40px); }
+.ap-ion-k-1 { top: calc(100% - 74px); left: calc(100% - var(--ap-k-right) - 64px); }
+.ap-ion-k-2 { top: calc(100% - 64px); left: calc(100% - var(--ap-k-right) - 52px); }
+.ap-ion-k-3 { top: calc(100% - 88px); left: calc(100% - var(--ap-k-right) - 72px); }
+.ap-ion-k-4 { top: calc(100% - 52px); left: calc(100% - var(--ap-k-right) - 84px); }
+.ap-ion-k-5 { top: calc(100% - 98px); left: calc(100% - var(--ap-k-right) - 44px); }
 
 .ap-threshold-spark,
 .ap-threshold-na {
@@ -1528,10 +1534,6 @@ h4 {
   animation-delay: 0.4s;
 }
 
-.ap-node-model.phase-threshold .ap-ion-na {
-  transform: translate(10px, 34px);
-}
-
 .ap-node-model.phase-depolarization .ap-channel-na .ap-open-indicator {
   opacity: 1;
   transform: translate(-50%, 0) scale(1);
@@ -1568,26 +1570,6 @@ h4 {
   box-shadow: inset 0 0 0 2px rgba(255, 215, 102, 0.72), 0 0 16px rgba(255, 208, 77, 0.5);
 }
 
-.ap-node-model.phase-depolarization .ap-ion-na {
-  transform: translateY(var(--ap-na-channel-shift));
-}
-
-.ap-node-model.phase-repolarization .ap-ion-na {
-  transform: translateY(var(--ap-na-channel-shift));
-}
-
-.ap-node-model.phase-hyperpolarization .ap-ion-na {
-  transform: translateY(var(--ap-na-channel-shift));
-}
-
-.ap-node-model.phase-repolarization .ap-ion-k {
-  transform: translateY(calc(-1 * var(--ap-k-channel-shift)));
-}
-
-.ap-node-model.phase-hyperpolarization .ap-ion-k {
-  transform: translateY(calc(-1 * var(--ap-k-channel-shift) - 14px));
-}
-
 .ap-node-model.phase-hyperpolarization .ap-charge-out {
   transform: scale(1.08);
   color: #1f4a97;
@@ -1609,7 +1591,7 @@ h4 {
 
 .ap-node-model.phase-depolarization .ap-pump-ion-na {
   animation: none;
-  opacity: 0.22;
+  opacity: 0.64;
 }
 
 .ap-node-model.phase-repolarization .ap-pump-ion-k,

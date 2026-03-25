@@ -2014,6 +2014,8 @@ function setupNerveImpulseMeasurement() {
 
 function setupActionPotentials() {
   const model = document.getElementById("apNodeModel");
+  const naChannel = document.getElementById("apNaChannel");
+  const kChannel = document.getElementById("apKChannel");
   const phaseLabel = document.getElementById("apPhaseLabel");
   const status = document.getElementById("apStatus");
   const phaseList = document.getElementById("apPhaseList");
@@ -2024,9 +2026,10 @@ function setupActionPotentials() {
   const traceMarker = document.getElementById("apTraceMarker");
   const chargeOut = model.querySelector(".ap-charge-out");
   const chargeIn = model.querySelector(".ap-charge-in");
+  const diffusionIons = [...model.querySelectorAll(".ap-ion")];
   const randomIons = [...model.querySelectorAll(".ap-random-ion")];
 
-  if (!model || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn || !traceBase || !traceMarker || !chargeOut || !chargeIn) {
+  if (!model || !naChannel || !kChannel || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn || !traceBase || !traceMarker || !chargeOut || !chargeIn) {
     return;
   }
 
@@ -2064,9 +2067,21 @@ function setupActionPotentials() {
   ];
 
   let phaseIndex = 0;
+  let phaseId = phases[0].id;
   let isPlaying = false;
   let timer = null;
+  let diffusionTimer = null;
   let randomIonTimer = null;
+  const crossingTimers = new Set();
+
+  const diffusionStates = diffusionIons.map((ion) => ({
+    el: ion,
+    type: ion.classList.contains("ap-ion-na") ? "na" : "k",
+    side: ion.classList.contains("ap-ion-na") ? "outside" : "inside",
+    crossing: false,
+    x: ion.offsetLeft,
+    y: ion.offsetTop
+  }));
 
   function actionPotentialValue(t) {
     if (t < 0.12) return -70;
@@ -2146,6 +2161,125 @@ function setupActionPotentials() {
     return Math.max(min, Math.min(max, value));
   }
 
+  function getChannelCenterX(channelEl) {
+    const channelRect = channelEl.getBoundingClientRect();
+    const modelRect = model.getBoundingClientRect();
+    return channelRect.left - modelRect.left + channelRect.width / 2;
+  }
+
+  function getDiffusionBounds(type, side) {
+    const width = model.clientWidth;
+    const height = model.clientHeight;
+    const membraneY = height / 2;
+
+    const sideTop = side === "outside" ? 20 : membraneY + 70;
+    const sideBottom = side === "outside" ? membraneY - 78 : height - 26;
+
+    if (type === "na") {
+      return {
+        minX: 16,
+        maxX: Math.min(width * 0.56, width - 36),
+        minY: sideTop,
+        maxY: Math.max(sideTop + 8, sideBottom)
+      };
+    }
+
+    return {
+      minX: Math.max(16, width * 0.44),
+      maxX: width - 36,
+      minY: sideTop,
+      maxY: Math.max(sideTop + 8, sideBottom)
+    };
+  }
+
+  function applyIonPosition(state) {
+    state.el.style.left = `${state.x.toFixed(1)}px`;
+    state.el.style.top = `${state.y.toFixed(1)}px`;
+  }
+
+  function seedDiffusionPositions() {
+    diffusionStates.forEach((state) => {
+      const bounds = getDiffusionBounds(state.type, state.side);
+      state.x = randomBetween(bounds.minX, bounds.maxX);
+      state.y = randomBetween(bounds.minY, bounds.maxY);
+      applyIonPosition(state);
+    });
+  }
+
+  function clearCrossingTimers() {
+    crossingTimers.forEach((id) => clearTimeout(id));
+    crossingTimers.clear();
+  }
+
+  function startChannelCrossing(state, channelEl, destinationSide) {
+    if (state.crossing) return;
+
+    const membraneY = model.clientHeight / 2;
+    const channelX = getChannelCenterX(channelEl);
+    const approachY = destinationSide === "inside" ? membraneY - 46 : membraneY + 46;
+    const destinationBounds = getDiffusionBounds(state.type, destinationSide);
+    const destinationY = destinationSide === "inside"
+      ? randomBetween(Math.max(destinationBounds.minY, membraneY + 84), destinationBounds.maxY)
+      : randomBetween(destinationBounds.minY, Math.min(destinationBounds.maxY, membraneY - 84));
+
+    state.crossing = true;
+    state.x = clamp(channelX + randomBetween(-5, 5), destinationBounds.minX, destinationBounds.maxX);
+    state.y = approachY;
+    applyIonPosition(state);
+
+    const travelTimer = setTimeout(() => {
+      state.x = clamp(channelX + randomBetween(-9, 9), destinationBounds.minX, destinationBounds.maxX);
+      state.y = destinationY;
+      applyIonPosition(state);
+      crossingTimers.delete(travelTimer);
+    }, 170);
+
+    const settleTimer = setTimeout(() => {
+      state.side = destinationSide;
+      state.crossing = false;
+      crossingTimers.delete(settleTimer);
+    }, 620);
+
+    crossingTimers.add(travelTimer);
+    crossingTimers.add(settleTimer);
+  }
+
+  function stepDiffusion() {
+    const naOpen = phaseId === "threshold" || phaseId === "depolarization";
+    const kOpen = phaseId === "repolarization" || phaseId === "hyperpolarization";
+
+    diffusionStates.forEach((state) => {
+      if (state.crossing) return;
+
+      const bounds = getDiffusionBounds(state.type, state.side);
+      state.x = clamp(state.x + randomBetween(-7, 7), bounds.minX, bounds.maxX);
+      state.y = clamp(state.y + randomBetween(-5, 5), bounds.minY, bounds.maxY);
+      applyIonPosition(state);
+
+      if (state.type === "na" && state.side === "outside" && naOpen && Math.random() < 0.12) {
+        startChannelCrossing(state, naChannel, "inside");
+      }
+
+      if (state.type === "k" && state.side === "inside" && kOpen && Math.random() < 0.12) {
+        startChannelCrossing(state, kChannel, "outside");
+      }
+    });
+  }
+
+  function stopDiffusionMotion() {
+    if (diffusionTimer) {
+      clearInterval(diffusionTimer);
+      diffusionTimer = null;
+    }
+    clearCrossingTimers();
+  }
+
+  function startDiffusionMotion() {
+    stopDiffusionMotion();
+    if (!diffusionStates.length) return;
+    diffusionTimer = setInterval(stepDiffusion, 220);
+  }
+
   function getRandomIonBounds(kind) {
     const naChannelLeft = model.clientWidth * 0.2;
     const kChannelRight = model.clientWidth * 0.78;
@@ -2211,6 +2345,7 @@ function setupActionPotentials() {
 
   function applyPhase() {
     const phase = phases[phaseIndex];
+    phaseId = phase.id;
     model.className = `ap-node-model phase-${phase.id}`;
     phaseLabel.textContent = `Phase: ${phase.label}`;
     status.textContent = phase.text;
@@ -2291,9 +2426,21 @@ function setupActionPotentials() {
     });
   });
 
+  seedDiffusionPositions();
+  startDiffusionMotion();
   applyPhase();
 
+  window.addEventListener("resize", () => {
+    diffusionStates.forEach((state) => {
+      const bounds = getDiffusionBounds(state.type, state.side);
+      state.x = clamp(state.x, bounds.minX, bounds.maxX);
+      state.y = clamp(state.y, bounds.minY, bounds.maxY);
+      applyIonPosition(state);
+    });
+  });
+
   window.addEventListener("beforeunload", () => {
+    stopDiffusionMotion();
     stopRandomIonMotion();
   });
 }
