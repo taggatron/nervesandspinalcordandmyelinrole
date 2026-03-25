@@ -1840,6 +1840,21 @@ h4 {
   }
 }
 
+@media (min-width: 901px) {
+  .ap-grid {
+    align-items: stretch;
+  }
+
+  .ap-stage {
+    display: flex;
+  }
+
+  .ap-node-model {
+    flex: 1;
+    height: 100%;
+  }
+}
+
 @keyframes reveal {
   to {
     opacity: 1;
@@ -1953,6 +1968,34 @@ h4 {
 }
 
 @media (max-width: 520px) {
+  .main-layout {
+    padding: 6px 10px 36px;
+  }
+
+  .card {
+    padding: 12px 10px;
+  }
+
+  .slot-label {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .button-row .btn {
+    flex: 1 1 100%;
+  }
+
+  .ap-phase-list li {
+    display: block;
+  }
+
+  .ap-phase-mv {
+    display: block;
+    margin-top: 2px;
+    white-space: normal;
+    text-align: left;
+  }
+
   .dropzone-wrap {
     overflow-x: visible;
     padding-bottom: 0;
