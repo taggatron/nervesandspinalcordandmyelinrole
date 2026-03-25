@@ -2042,7 +2042,7 @@ function setupActionPotentials() {
     {
       id: "threshold",
       label: "Threshold potential",
-      text: "Small depolarizing inputs bring the membrane toward threshold. Some Na+ begins diffusing in near the Na+ channel."
+      text: "Small depolarizing inputs bring the membrane toward threshold, priming the channel to open in the next phase."
     },
     {
       id: "depolarization",
@@ -2245,9 +2245,9 @@ function setupActionPotentials() {
   }
 
   function stepDiffusion() {
-    const naOpen = phaseId === "threshold" || phaseId === "depolarization";
+    const naOpen = phaseId === "depolarization";
     const kOpen = phaseId === "repolarization" || phaseId === "hyperpolarization";
-    const naCrossChance = phaseId === "depolarization" ? 0.22 : phaseId === "threshold" ? 0.03 : 0;
+    const naCrossChance = phaseId === "depolarization" ? 0.22 : 0;
 
     diffusionStates.forEach((state) => {
       if (state.crossing) return;
