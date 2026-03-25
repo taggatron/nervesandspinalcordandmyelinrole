@@ -1082,6 +1082,8 @@ h4 {
 .ap-node-model {
   --ap-na-left: clamp(72px, 10%, 112px);
   --ap-k-right: clamp(72px, 10%, 112px);
+  --ap-na-channel-shift: clamp(124px, calc(44% - 14px), 232px);
+  --ap-k-channel-shift: clamp(118px, calc(40% - 8px), 220px);
   position: relative;
   border-radius: 14px;
   min-height: 300px;
@@ -1567,23 +1569,23 @@ h4 {
 }
 
 .ap-node-model.phase-depolarization .ap-ion-na {
-  transform: translateY(124px);
+  transform: translateY(var(--ap-na-channel-shift));
 }
 
 .ap-node-model.phase-repolarization .ap-ion-na {
-  transform: translateY(124px);
+  transform: translateY(var(--ap-na-channel-shift));
 }
 
 .ap-node-model.phase-hyperpolarization .ap-ion-na {
-  transform: translateY(124px);
+  transform: translateY(var(--ap-na-channel-shift));
 }
 
 .ap-node-model.phase-repolarization .ap-ion-k {
-  transform: translateY(-118px);
+  transform: translateY(calc(-1 * var(--ap-k-channel-shift)));
 }
 
 .ap-node-model.phase-hyperpolarization .ap-ion-k {
-  transform: translateY(-132px);
+  transform: translateY(calc(-1 * var(--ap-k-channel-shift) - 14px));
 }
 
 .ap-node-model.phase-hyperpolarization .ap-charge-out {
