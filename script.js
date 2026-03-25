@@ -2083,9 +2083,11 @@ function setupActionPotentials() {
     side: ion.classList.contains("ap-ion-na") ? "outside" : "inside",
     crossing: false,
     pumping: false,
+    releaseCooldownUntil: 0,
     x: ion.offsetLeft,
     y: ion.offsetTop
   }));
+  const maxDynamicDiffusionIons = 34;
 
   function actionPotentialValue(t) {
     if (t < 0.12) return -70;
@@ -2205,6 +2207,39 @@ function setupActionPotentials() {
     state.el.style.opacity = visible ? "1" : "0";
   }
 
+  function teleportIonWithoutTransition(state, x, y) {
+    const prevTransition = state.el.style.transition;
+    state.el.style.transition = "none";
+    state.x = x;
+    state.y = y;
+    applyIonPosition(state);
+    // Force style flush so the next move uses normal transitions.
+    void state.el.offsetWidth;
+    state.el.style.transition = prevTransition;
+  }
+
+  function createInjectedIon(type, side) {
+    const ion = document.createElement("span");
+    ion.className = `ap-ion ap-ion-${type}`;
+    ion.setAttribute("aria-hidden", "true");
+    ion.textContent = type === "na" ? "Na+" : "K+";
+    model.appendChild(ion);
+
+    const state = {
+      el: ion,
+      type,
+      side,
+      crossing: false,
+      pumping: false,
+      releaseCooldownUntil: 0,
+      x: 0,
+      y: 0
+    };
+
+    diffusionStates.push(state);
+    return state;
+  }
+
   function seedDiffusionPositions() {
     diffusionStates.forEach((state) => {
       const bounds = getDiffusionBounds(state.type, state.side);
@@ -2257,17 +2292,62 @@ function setupActionPotentials() {
     crossingTimers.add(settleTimer);
   }
 
+  function buildRepulsionVectors(states) {
+    const vectors = new Map();
+    const repulsionRadius = 34;
+    const repulsionRadiusSq = repulsionRadius * repulsionRadius;
+    const repulsionStrength = 4.8;
+    const minDistance = 3;
+
+    states.forEach((state) => {
+      vectors.set(state, { x: 0, y: 0 });
+    });
+
+    for (let i = 0; i < states.length; i += 1) {
+      for (let j = i + 1; j < states.length; j += 1) {
+        const a = states[i];
+        const b = states[j];
+
+        if (a.side !== b.side) continue;
+
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distSq = dx * dx + dy * dy;
+
+        if (distSq > repulsionRadiusSq) continue;
+
+        const distance = Math.max(minDistance, Math.sqrt(distSq));
+        const falloff = 1 - distance / repulsionRadius;
+        const force = falloff * falloff * repulsionStrength;
+        const ux = dx / distance;
+        const uy = dy / distance;
+
+        const vecA = vectors.get(a);
+        const vecB = vectors.get(b);
+
+        vecA.x += ux * force;
+        vecA.y += uy * force;
+        vecB.x -= ux * force;
+        vecB.y -= uy * force;
+      }
+    }
+
+    return vectors;
+  }
+
   function stepDiffusion() {
     const naOpen = phaseId === "depolarization";
     const kOpen = phaseId === "repolarization" || phaseId === "hyperpolarization";
     const naCrossChance = phaseId === "depolarization" ? 0.22 : 0;
+    const activeStates = diffusionStates.filter((state) => !state.crossing && !state.pumping);
+    const repulsion = buildRepulsionVectors(activeStates);
 
-    diffusionStates.forEach((state) => {
-      if (state.crossing || state.pumping) return;
+    activeStates.forEach((state) => {
+      const repel = repulsion.get(state) || { x: 0, y: 0 };
 
       const bounds = getDiffusionBounds(state.type, state.side);
-      state.x = clamp(state.x + randomBetween(-7, 7), bounds.minX, bounds.maxX);
-      state.y = clamp(state.y + randomBetween(-5, 5), bounds.minY, bounds.maxY);
+      state.x = clamp(state.x + randomBetween(-7, 7) + repel.x, bounds.minX, bounds.maxX);
+      state.y = clamp(state.y + randomBetween(-5, 5) + repel.y, bounds.minY, bounds.maxY);
       applyIonPosition(state);
 
       if (state.type === "na" && state.side === "outside" && naOpen && Math.random() < naCrossChance) {
@@ -2323,69 +2403,134 @@ function setupActionPotentials() {
     pumpTransitTimers.add(id);
   }
 
+  function feedPumpSubstrates() {
+    if (diffusionStates.length > maxDynamicDiffusionIons - 5) return;
+
+    const naFeed = [
+      createInjectedIon("na", "inside"),
+      createInjectedIon("na", "inside"),
+      createInjectedIon("na", "inside")
+    ];
+    const kFeed = [
+      createInjectedIon("k", "outside"),
+      createInjectedIon("k", "outside")
+    ];
+
+    const naBounds = getDiffusionBounds("na", "inside");
+    const kBounds = getDiffusionBounds("k", "outside");
+
+    naFeed.forEach((state, idx) => {
+      state.side = "inside";
+      state.crossing = true;
+      state.x = clamp(randomBetween(naBounds.minX, naBounds.maxX) + idx * 4, naBounds.minX, naBounds.maxX);
+      setIonTransportVisibility(state, true);
+      teleportIonWithoutTransition(state, state.x, model.clientHeight + 90);
+
+      queuePumpPhase(() => {
+        state.y = clamp(naBounds.maxY - randomBetween(2, 16), naBounds.minY, naBounds.maxY);
+        applyIonPosition(state);
+      }, 30);
+
+      queuePumpPhase(() => {
+        state.crossing = false;
+      }, 680);
+    });
+
+    kFeed.forEach((state, idx) => {
+      state.side = "outside";
+      state.crossing = true;
+      state.x = clamp(randomBetween(kBounds.minX, kBounds.maxX) - idx * 5, kBounds.minX, kBounds.maxX);
+      setIonTransportVisibility(state, true);
+      teleportIonWithoutTransition(state, state.x, -90);
+
+      queuePumpPhase(() => {
+        state.y = clamp(kBounds.minY + randomBetween(2, 16), kBounds.minY, kBounds.maxY);
+        applyIonPosition(state);
+      }, 30);
+
+      queuePumpPhase(() => {
+        state.crossing = false;
+      }, 680);
+    });
+  }
+
   function runPumpTransportCycle() {
     if (!(phaseId === "resting" || phaseId === "recovery")) return;
 
-    const naToMove = pickTransportIons("na", "inside", 3);
-    const kToMove = pickTransportIons("k", "outside", 2);
+    const pumpFeedInMs = 760;
+    const pumpEdgeStickMs = 700;
+    const pumpTransitMs = 900;
+    const pumpReleaseSettleMs = 1200;
 
-    if (naToMove.length < 3 || kToMove.length < 2) return;
-
-    const bounds = getPumpBounds();
-    const naIntakeY = bounds.bottom - 10;
-    const naReleaseY = bounds.top - 20;
-    const kIntakeY = bounds.top + 8;
-    const kReleaseY = bounds.bottom + 18;
-
-    naToMove.forEach((state, idx) => {
-      state.pumping = true;
-      state.crossing = true;
-      state.x = bounds.centerX - 20 + idx * 12;
-      state.y = naIntakeY;
-      setIonTransportVisibility(state, false);
-      applyIonPosition(state);
-    });
-
-    kToMove.forEach((state, idx) => {
-      state.pumping = true;
-      state.crossing = true;
-      state.x = bounds.centerX - 8 + idx * 16;
-      state.y = kIntakeY;
-      setIonTransportVisibility(state, false);
-      applyIonPosition(state);
-    });
+    feedPumpSubstrates();
 
     queuePumpPhase(() => {
+      const naToMove = pickTransportIons("na", "inside", 3);
+      const kToMove = pickTransportIons("k", "outside", 2);
+
+      if (naToMove.length < 3 || kToMove.length < 2) return;
+
+      const bounds = getPumpBounds();
+      const naIntakeY = bounds.bottom - 10;
+      const naReleaseY = bounds.top - 20;
+      const kIntakeY = bounds.top + 8;
+      const kReleaseY = bounds.bottom + 18;
+
       naToMove.forEach((state, idx) => {
-        const outBounds = getDiffusionBounds("na", "outside");
-        state.x = clamp(bounds.centerX - 24 + idx * 12, outBounds.minX, outBounds.maxX);
-        state.y = clamp(naReleaseY, outBounds.minY, outBounds.maxY);
+        state.pumping = true;
+        state.crossing = true;
+        state.x = bounds.centerX - 20 + idx * 12;
+        state.y = naIntakeY;
         setIonTransportVisibility(state, true);
         applyIonPosition(state);
       });
 
       kToMove.forEach((state, idx) => {
-        const inBounds = getDiffusionBounds("k", "inside");
-        state.x = clamp(bounds.centerX - 8 + idx * 16, inBounds.minX, inBounds.maxX);
-        state.y = clamp(kReleaseY, inBounds.minY, inBounds.maxY);
+        state.pumping = true;
+        state.crossing = true;
+        state.x = bounds.centerX - 8 + idx * 16;
+        state.y = kIntakeY;
         setIonTransportVisibility(state, true);
         applyIonPosition(state);
       });
-    }, 900);
 
-    queuePumpPhase(() => {
-      naToMove.forEach((state) => {
-        state.side = "outside";
-        state.crossing = false;
-        state.pumping = false;
-      });
+      queuePumpPhase(() => {
+        naToMove.forEach((state, idx) => {
+          const outBounds = getDiffusionBounds("na", "outside");
+          state.x = clamp(bounds.centerX - 24 + idx * 12, outBounds.minX, outBounds.maxX);
+          state.y = clamp(naReleaseY, outBounds.minY, outBounds.maxY);
+          setIonTransportVisibility(state, true);
+          applyIonPosition(state);
+        });
 
-      kToMove.forEach((state) => {
-        state.side = "inside";
-        state.crossing = false;
-        state.pumping = false;
-      });
-    }, 2200);
+        kToMove.forEach((state, idx) => {
+          const inBounds = getDiffusionBounds("k", "inside");
+          state.x = clamp(bounds.centerX - 8 + idx * 16, inBounds.minX, inBounds.maxX);
+          state.y = clamp(kReleaseY, inBounds.minY, inBounds.maxY);
+          setIonTransportVisibility(state, true);
+          applyIonPosition(state);
+        });
+      }, pumpEdgeStickMs + pumpTransitMs);
+
+      queuePumpPhase(() => {
+        const releaseCooldownMs = 2800;
+        const releaseUntil = Date.now() + releaseCooldownMs;
+
+        naToMove.forEach((state) => {
+          state.side = "outside";
+          state.crossing = false;
+          state.pumping = false;
+          state.releaseCooldownUntil = releaseUntil;
+        });
+
+        kToMove.forEach((state) => {
+          state.side = "inside";
+          state.crossing = false;
+          state.pumping = false;
+          state.releaseCooldownUntil = releaseUntil;
+        });
+      }, pumpEdgeStickMs + pumpTransitMs + pumpReleaseSettleMs);
+    }, pumpFeedInMs);
   }
 
   function stopPumpTransport() {
@@ -2395,6 +2540,7 @@ function setupActionPotentials() {
     }
     clearPumpTransitTimers();
     diffusionStates.forEach((state) => {
+      state.crossing = false;
       state.pumping = false;
       setIonTransportVisibility(state, true);
     });
@@ -2403,7 +2549,7 @@ function setupActionPotentials() {
   function startPumpTransport() {
     stopPumpTransport();
     runPumpTransportCycle();
-    pumpTimer = setInterval(runPumpTransportCycle, 3000);
+    pumpTimer = setInterval(runPumpTransportCycle, 3600);
   }
 
   function rebalanceForRestingPotential() {
