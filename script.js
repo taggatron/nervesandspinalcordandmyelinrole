@@ -2024,6 +2024,7 @@ function setupActionPotentials() {
   const traceMarker = document.getElementById("apTraceMarker");
   const chargeOut = model.querySelector(".ap-charge-out");
   const chargeIn = model.querySelector(".ap-charge-in");
+  const randomIons = [...model.querySelectorAll(".ap-random-ion")];
 
   if (!model || !phaseLabel || !status || !phaseList || !playPauseBtn || !stepBtn || !resetBtn || !traceBase || !traceMarker || !chargeOut || !chargeIn) {
     return;
@@ -2065,6 +2066,7 @@ function setupActionPotentials() {
   let phaseIndex = 0;
   let isPlaying = false;
   let timer = null;
+  let randomIonTimer = null;
 
   function actionPotentialValue(t) {
     if (t < 0.12) return -70;
@@ -2136,6 +2138,77 @@ function setupActionPotentials() {
     }
   }
 
+  function randomBetween(min, max) {
+    return min + Math.random() * (max - min);
+  }
+
+  function clamp(value, min, max) {
+    return Math.max(min, Math.min(max, value));
+  }
+
+  function getRandomIonBounds(kind) {
+    const naChannelLeft = model.clientWidth * 0.2;
+    const kChannelRight = model.clientWidth * 0.78;
+
+    if (kind === "na") {
+      return {
+        minX: 14,
+        maxX: Math.max(20, naChannelLeft),
+        minY: 20,
+        maxY: 84
+      };
+    }
+
+    return {
+      minX: Math.max(14, kChannelRight - 22),
+      maxX: Math.max(kChannelRight, model.clientWidth - 44),
+      minY: 170,
+      maxY: Math.max(176, model.clientHeight - 28)
+    };
+  }
+
+  function positionRandomIon(ion, drift = true) {
+    const kind = ion.dataset.ion;
+    const bounds = getRandomIonBounds(kind);
+
+    let x;
+    let y;
+
+    const previousX = Number.parseFloat(ion.dataset.x || "");
+    const previousY = Number.parseFloat(ion.dataset.y || "");
+    const hasPrevious = Number.isFinite(previousX) && Number.isFinite(previousY);
+
+    if (!drift || !hasPrevious) {
+      x = randomBetween(bounds.minX, bounds.maxX);
+      y = randomBetween(bounds.minY, bounds.maxY);
+    } else {
+      x = clamp(previousX + randomBetween(-28, 28), bounds.minX, bounds.maxX);
+      y = clamp(previousY + randomBetween(-16, 16), bounds.minY, bounds.maxY);
+    }
+
+    ion.dataset.x = x.toFixed(1);
+    ion.dataset.y = y.toFixed(1);
+    ion.style.left = `${x.toFixed(1)}px`;
+    ion.style.top = `${y.toFixed(1)}px`;
+  }
+
+  function stopRandomIonMotion() {
+    if (randomIonTimer) {
+      clearInterval(randomIonTimer);
+      randomIonTimer = null;
+    }
+  }
+
+  function startRandomIonMotion() {
+    stopRandomIonMotion();
+    if (!randomIons.length) return;
+
+    randomIons.forEach((ion) => positionRandomIon(ion, false));
+    randomIonTimer = setInterval(() => {
+      randomIons.forEach((ion) => positionRandomIon(ion, true));
+    }, 1200);
+  }
+
   function applyPhase() {
     const phase = phases[phaseIndex];
     model.className = `ap-node-model phase-${phase.id}`;
@@ -2158,6 +2231,13 @@ function setupActionPotentials() {
     const chargeState = chargeByPhase[phase.id] || chargeByPhase.resting;
     setCharge(chargeOut, chargeState.out);
     setCharge(chargeIn, chargeState.in);
+
+    const pumpActive = phase.id === "resting" || phase.id === "recovery";
+    if (pumpActive) {
+      startRandomIonMotion();
+    } else {
+      stopRandomIonMotion();
+    }
   }
 
   function stopPlayback() {
@@ -2212,6 +2292,10 @@ function setupActionPotentials() {
   });
 
   applyPhase();
+
+  window.addEventListener("beforeunload", () => {
+    stopRandomIonMotion();
+  });
 }
 
 function initRevealOnScroll() {

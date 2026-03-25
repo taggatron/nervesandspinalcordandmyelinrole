@@ -1084,7 +1084,7 @@ h4 {
   --ap-k-right: clamp(72px, 10%, 112px);
   position: relative;
   border-radius: 14px;
-  min-height: 260px;
+  min-height: 300px;
   padding: 20px 16px;
   background: linear-gradient(180deg, rgba(249, 252, 255, 0.95), rgba(233, 242, 252, 0.88));
   border: 1px solid rgba(52, 81, 124, 0.2);
@@ -1189,8 +1189,45 @@ h4 {
   position: relative;
   z-index: 2;
   font-weight: 800;
-  color: #263750;
+  color: #12161f;
   font-size: 1.05rem;
+}
+
+.ap-channel-callout {
+  position: absolute;
+  left: 50%;
+  top: -44px;
+  transform: translateX(-50%);
+  z-index: 5;
+  color: #0e1118;
+  background: #ffffff;
+  border: 1.5px solid #12161f;
+  border-radius: 6px;
+  font-size: 0.64rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  padding: 2px 6px;
+}
+
+.ap-channel-na .ap-channel-callout {
+  left: 70%;
+}
+
+.ap-channel-k .ap-channel-callout {
+  left: 40%;
+}
+
+.ap-channel-callout::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 100%;
+  transform: translateX(-50%);
+  width: 1.5px;
+  height: 20px;
+  background: #12161f;
 }
 
 .ap-open-indicator {
@@ -1367,6 +1404,29 @@ h4 {
   top: 106px;
 }
 
+.ap-random-ion {
+  position: absolute;
+  z-index: 3;
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 3px 7px;
+  border-radius: 999px;
+  opacity: 0;
+  transition: left 1.4s ease-in-out, top 1.4s ease-in-out, opacity 0.25s ease;
+  will-change: left, top, opacity;
+  pointer-events: none;
+}
+
+.ap-random-ion-na {
+  color: #123f91;
+  background: rgba(47, 117, 255, 0.22);
+}
+
+.ap-random-ion-k {
+  color: #0f6e4e;
+  background: rgba(15, 157, 88, 0.24);
+}
+
 .ap-charge {
   position: absolute;
   width: 30px;
@@ -1510,6 +1570,14 @@ h4 {
   transform: translateY(124px);
 }
 
+.ap-node-model.phase-repolarization .ap-ion-na {
+  transform: translateY(124px);
+}
+
+.ap-node-model.phase-hyperpolarization .ap-ion-na {
+  transform: translateY(124px);
+}
+
 .ap-node-model.phase-repolarization .ap-ion-k {
   transform: translateY(-118px);
 }
@@ -1552,6 +1620,11 @@ h4 {
   opacity: 0.82;
 }
 
+.ap-node-model.phase-resting .ap-random-ion,
+.ap-node-model.phase-recovery .ap-random-ion {
+  opacity: 0.95;
+}
+
 @keyframes pump-pulse {
   0%, 100% { transform: translateX(-50%) scale(1); }
   50% { transform: translateX(-50%) scale(1.04); }
@@ -1563,15 +1636,15 @@ h4 {
 }
 
 @keyframes ap-pump-na-flow {
-  0% { transform: translate(0, 8px) scale(0.95); opacity: 0.15; }
+  0% { transform: translate(0, 8px) scale(0.95); opacity: 0.88; }
   35% { transform: translate(10px, 0) scale(1); opacity: 1; }
-  100% { transform: translate(22px, -20px) scale(0.95); opacity: 0.1; }
+  100% { transform: translate(22px, -20px) scale(0.95); opacity: 0.88; }
 }
 
 @keyframes ap-pump-k-flow {
-  0% { transform: translate(0, -10px) scale(0.95); opacity: 0.2; }
+  0% { transform: translate(0, -10px) scale(0.95); opacity: 0.88; }
   40% { transform: translate(-10px, 0) scale(1); opacity: 1; }
-  100% { transform: translate(-22px, 18px) scale(0.95); opacity: 0.1; }
+  100% { transform: translate(-22px, 18px) scale(0.95); opacity: 0.88; }
 }
 
 @keyframes ap-charge-swap {
