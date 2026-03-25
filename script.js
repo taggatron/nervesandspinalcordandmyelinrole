@@ -2247,6 +2247,7 @@ function setupActionPotentials() {
   function stepDiffusion() {
     const naOpen = phaseId === "threshold" || phaseId === "depolarization";
     const kOpen = phaseId === "repolarization" || phaseId === "hyperpolarization";
+    const naCrossChance = phaseId === "depolarization" ? 0.22 : phaseId === "threshold" ? 0.03 : 0;
 
     diffusionStates.forEach((state) => {
       if (state.crossing) return;
@@ -2256,7 +2257,7 @@ function setupActionPotentials() {
       state.y = clamp(state.y + randomBetween(-5, 5), bounds.minY, bounds.maxY);
       applyIonPosition(state);
 
-      if (state.type === "na" && state.side === "outside" && naOpen && Math.random() < 0.12) {
+      if (state.type === "na" && state.side === "outside" && naOpen && Math.random() < naCrossChance) {
         startChannelCrossing(state, naChannel, "inside");
       }
 
