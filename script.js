@@ -2201,6 +2201,10 @@ function setupActionPotentials() {
     state.el.style.top = `${state.y.toFixed(1)}px`;
   }
 
+  function setIonTransportVisibility(state, visible) {
+    state.el.style.opacity = visible ? "1" : "0";
+  }
+
   function seedDiffusionPositions() {
     diffusionStates.forEach((state) => {
       const bounds = getDiffusionBounds(state.type, state.side);
@@ -2338,6 +2342,7 @@ function setupActionPotentials() {
       state.crossing = true;
       state.x = bounds.centerX - 20 + idx * 12;
       state.y = naIntakeY;
+      setIonTransportVisibility(state, false);
       applyIonPosition(state);
     });
 
@@ -2346,6 +2351,7 @@ function setupActionPotentials() {
       state.crossing = true;
       state.x = bounds.centerX - 8 + idx * 16;
       state.y = kIntakeY;
+      setIonTransportVisibility(state, false);
       applyIonPosition(state);
     });
 
@@ -2354,6 +2360,7 @@ function setupActionPotentials() {
         const outBounds = getDiffusionBounds("na", "outside");
         state.x = clamp(bounds.centerX - 24 + idx * 12, outBounds.minX, outBounds.maxX);
         state.y = clamp(naReleaseY, outBounds.minY, outBounds.maxY);
+        setIonTransportVisibility(state, true);
         applyIonPosition(state);
       });
 
@@ -2361,6 +2368,7 @@ function setupActionPotentials() {
         const inBounds = getDiffusionBounds("k", "inside");
         state.x = clamp(bounds.centerX - 8 + idx * 16, inBounds.minX, inBounds.maxX);
         state.y = clamp(kReleaseY, inBounds.minY, inBounds.maxY);
+        setIonTransportVisibility(state, true);
         applyIonPosition(state);
       });
     }, 220);
@@ -2388,6 +2396,7 @@ function setupActionPotentials() {
     clearPumpTransitTimers();
     diffusionStates.forEach((state) => {
       state.pumping = false;
+      setIonTransportVisibility(state, true);
     });
   }
 
