@@ -1402,7 +1402,7 @@ h4 {
 }
 
 .ap-threshold-na {
-  top: 74px;
+  top: calc(50% + 48px);
   font-size: 0.8rem;
   font-weight: 800;
   color: #123f91;
@@ -1412,7 +1412,7 @@ h4 {
 }
 
 .ap-threshold-na-2 {
-  top: 106px;
+  top: calc(50% + 82px);
 }
 
 .ap-random-ion {
@@ -1657,14 +1657,14 @@ h4 {
 
 @keyframes ap-threshold-na-in {
   0% {
-    transform: translate(-22px, -2px) scale(0.85);
+    transform: translate(-32px, -4px) scale(0.85);
     opacity: 0;
   }
   36% {
     opacity: 1;
   }
   100% {
-    transform: translate(124px, 72px) scale(1);
+    transform: translate(134px, 14px) scale(1);
     opacity: 0;
   }
 }
