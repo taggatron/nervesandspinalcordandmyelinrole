@@ -2767,6 +2767,31 @@ function initRevealOnScroll() {
   cards.forEach((c) => observer.observe(c));
 }
 
+function setupFunctionalOrganisationNavigation() {
+  const section = document.getElementById("functionalOrganisationSection");
+  const triggers = [...document.querySelectorAll(".js-open-functional-org")];
+
+  if (!section || !triggers.length) {
+    return;
+  }
+
+  function revealAndScroll() {
+    if (section.hasAttribute("hidden")) {
+      section.removeAttribute("hidden");
+      section.style.animationPlayState = "running";
+    }
+
+    section.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  triggers.forEach((trigger) => {
+    trigger.addEventListener("click", (event) => {
+      event.preventDefault();
+      revealAndScroll();
+    });
+  });
+}
+
 const style = document.createElement("style");
 style.textContent = `
 @keyframes dash {
@@ -2784,4 +2809,5 @@ setupSaltatoryConduction();
 setupCompareTask();
 setupNerveImpulseMeasurement();
 setupActionPotentials();
+setupFunctionalOrganisationNavigation();
 initRevealOnScroll();
