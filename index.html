@@ -159,7 +159,7 @@
 
         <article class="func-container func-container-wide">
           <h3>Container 2: Somatic vs Autonomic Motor Pathways</h3>
-          <svg class="func-svg" viewBox="0 0 980 520" role="img" aria-label="Somatic and autonomic motor pathways with sympathetic trunk">
+          <svg class="func-svg" viewBox="0 0 980 520" role="img" aria-label="Somatic and autonomic motor pathway overview">
             <rect x="34" y="30" width="430" height="456" rx="16" class="func-panel func-panel-somatic"></rect>
             <rect x="514" y="30" width="432" height="456" rx="16" class="func-panel func-panel-autonomic"></rect>
 
@@ -186,43 +186,55 @@
             <rect x="560" y="224" width="208" height="50" rx="12" class="func-box func-box-neuron"></rect>
             <text x="664" y="254" text-anchor="middle" class="func-box-text">Preganglionic neurone</text>
 
-            <rect x="742" y="182" width="108" height="170" rx="14" class="func-trunk"></rect>
-            <text x="796" y="205" text-anchor="middle" class="func-trunk-title">Sympathetic</text>
-            <text x="796" y="226" text-anchor="middle" class="func-trunk-title">trunk</text>
-            <circle cx="796" cy="252" r="8" class="func-ganglion"></circle>
-            <circle cx="796" cy="282" r="8" class="func-ganglion"></circle>
-            <circle cx="796" cy="312" r="8" class="func-ganglion"></circle>
+            <line x1="664" y1="274" x2="664" y2="336" class="func-path func-path-symp"></line>
+            <polygon points="664,336 656,322 672,322" class="func-arrow func-path-symp"></polygon>
+            <rect x="592" y="336" width="144" height="50" rx="12" class="func-box func-box-neuron"></rect>
+            <text x="664" y="366" text-anchor="middle" class="func-box-text">Ganglion</text>
 
-            <line x1="768" y1="249" x2="742" y2="249" class="func-path func-path-symp"></line>
-            <polygon points="742,249 756,241 756,257" class="func-arrow func-path-symp"></polygon>
-            <line x1="850" y1="249" x2="810" y2="249" class="func-path func-path-symp"></line>
-            <polygon points="810,249 824,241 824,257" class="func-arrow func-path-symp"></polygon>
-            <rect x="810" y="224" width="122" height="50" rx="12" class="func-box func-box-neuron"></rect>
-            <text x="871" y="254" text-anchor="middle" class="func-box-text">Postganglionic</text>
-            <line x1="871" y1="274" x2="871" y2="340" class="func-path func-path-symp"></line>
-            <polygon points="871,340 863,326 879,326" class="func-arrow func-path-symp"></polygon>
+            <line x1="664" y1="386" x2="664" y2="438" class="func-path func-path-symp"></line>
+            <polygon points="664,438 656,424 672,424" class="func-arrow func-path-symp"></polygon>
+            <rect x="572" y="438" width="184" height="50" rx="12" class="func-box func-box-neuron"></rect>
+            <text x="664" y="468" text-anchor="middle" class="func-box-text">Postganglionic neurone</text>
 
-            <line x1="664" y1="274" x2="664" y2="342" class="func-path func-path-para"></line>
-            <polygon points="664,342 656,328 672,328" class="func-arrow func-path-para"></polygon>
-            <rect x="550" y="342" width="228" height="50" rx="12" class="func-box func-box-neuron"></rect>
-            <text x="664" y="372" text-anchor="middle" class="func-box-text">Terminal ganglion</text>
-            <line x1="774" y1="367" x2="744" y2="367" class="func-path func-path-para"></line>
-            <polygon points="744,367 758,359 758,375" class="func-arrow func-path-para"></polygon>
-
-            <rect x="744" y="342" width="154" height="50" rx="12" class="func-box func-box-neuron"></rect>
-            <text x="821" y="372" text-anchor="middle" class="func-box-text">Postganglionic</text>
-            <line x1="821" y1="392" x2="821" y2="444" class="func-path func-path-para"></line>
-            <polygon points="821,444 813,430 829,430" class="func-arrow func-path-para"></polygon>
-            <rect x="700" y="444" width="232" height="42" rx="12" class="func-box func-box-target"></rect>
-            <text x="816" y="463" text-anchor="middle" class="func-box-text">
-              <tspan x="816" dy="0">Smooth muscle, cardiac</tspan>
-              <tspan x="816" dy="15">muscle, and glands</tspan>
+            <line x1="756" y1="463" x2="820" y2="463" class="func-path func-path-symp"></line>
+            <polygon points="820,463 806,455 806,471" class="func-arrow func-path-symp"></polygon>
+            <rect x="820" y="440" width="140" height="46" rx="12" class="func-box func-box-target"></rect>
+            <text x="890" y="458" text-anchor="middle" class="func-box-text">
+              <tspan x="890" dy="0">Smooth muscle, cardiac</tspan>
+              <tspan x="890" dy="15">muscle, and glands</tspan>
             </text>
           </svg>
         </article>
 
         <article class="func-container">
           <h3>Container 3: Parasympathetic Nervous System</h3>
+          <svg class="func-svg func-mini-svg" viewBox="0 0 520 340" role="img" aria-label="Parasympathetic motor pathway with long preganglionic and short postganglionic neurone">
+            <rect x="186" y="16" width="148" height="44" rx="12" class="func-box func-box-cns"></rect>
+            <text x="260" y="43" text-anchor="middle" class="func-box-text">CNS</text>
+
+            <line x1="260" y1="60" x2="260" y2="86" class="func-path func-path-para"></line>
+            <polygon points="260,86 252,72 268,72" class="func-arrow func-path-para"></polygon>
+            <rect x="146" y="86" width="228" height="46" rx="12" class="func-box func-box-neuron"></rect>
+            <text x="260" y="114" text-anchor="middle" class="func-box-text">Preganglionic neurone</text>
+
+            <line x1="260" y1="132" x2="260" y2="228" class="func-path func-path-para"></line>
+            <polygon points="260,228 252,214 268,214" class="func-arrow func-path-para"></polygon>
+            <rect x="198" y="228" width="124" height="36" rx="10" class="func-box func-box-neuron"></rect>
+            <text x="260" y="250" text-anchor="middle" class="func-mini-text">Ganglion</text>
+
+            <line x1="260" y1="264" x2="260" y2="286" class="func-path func-path-para"></line>
+            <polygon points="260,286 252,272 268,272" class="func-arrow func-path-para"></polygon>
+            <rect x="168" y="286" width="184" height="40" rx="10" class="func-box func-box-neuron"></rect>
+            <text x="260" y="310" text-anchor="middle" class="func-mini-text">Postganglionic neurone</text>
+
+            <line x1="352" y1="306" x2="404" y2="306" class="func-path func-path-para"></line>
+            <polygon points="404,306 390,298 390,314" class="func-arrow func-path-para"></polygon>
+            <rect x="404" y="286" width="106" height="40" rx="10" class="func-box func-box-target"></rect>
+            <text x="457" y="304" text-anchor="middle" class="func-mini-text">
+              <tspan x="457" dy="0">Smooth/cardiac</tspan>
+              <tspan x="457" dy="12">muscle + glands</tspan>
+            </text>
+          </svg>
           <p class="structure-text">
             The parasympathetic division supports rest-and-digest states. It slows heart rate, promotes gut motility and secretion,
             and supports nutrient absorption and energy storage.
@@ -236,6 +248,33 @@
 
         <article class="func-container">
           <h3>Container 4: Sympathetic Nervous System</h3>
+          <svg class="func-svg func-mini-svg" viewBox="0 0 520 340" role="img" aria-label="Sympathetic motor pathway using sympathetic trunk between preganglionic and postganglionic neurones">
+            <rect x="186" y="16" width="148" height="44" rx="12" class="func-box func-box-cns"></rect>
+            <text x="260" y="43" text-anchor="middle" class="func-box-text">CNS</text>
+
+            <line x1="260" y1="60" x2="260" y2="126" class="func-path func-path-symp"></line>
+            <polygon points="260,126 252,112 268,112" class="func-arrow func-path-symp"></polygon>
+            <rect x="146" y="126" width="228" height="46" rx="12" class="func-box func-box-neuron"></rect>
+            <text x="260" y="154" text-anchor="middle" class="func-box-text">Preganglionic neurone</text>
+
+            <line x1="374" y1="149" x2="404" y2="149" class="func-path func-path-symp"></line>
+            <polygon points="404,149 390,141 390,157" class="func-arrow func-path-symp"></polygon>
+            <rect x="404" y="94" width="84" height="120" rx="12" class="func-trunk"></rect>
+            <text x="446" y="120" text-anchor="middle" class="func-trunk-title">Sympathetic</text>
+            <text x="446" y="140" text-anchor="middle" class="func-trunk-title">trunk</text>
+            <circle cx="446" cy="160" r="7" class="func-ganglion"></circle>
+            <circle cx="446" cy="182" r="7" class="func-ganglion"></circle>
+
+            <line x1="488" y1="149" x2="488" y2="232" class="func-path func-path-symp"></line>
+            <polygon points="488,232 480,218 496,218" class="func-arrow func-path-symp"></polygon>
+            <rect x="302" y="232" width="204" height="42" rx="10" class="func-box func-box-neuron"></rect>
+            <text x="404" y="257" text-anchor="middle" class="func-mini-text">Postganglionic neurone</text>
+
+            <line x1="404" y1="274" x2="404" y2="298" class="func-path func-path-symp"></line>
+            <polygon points="404,298 396,284 412,284" class="func-arrow func-path-symp"></polygon>
+            <rect x="302" y="298" width="204" height="30" rx="10" class="func-box func-box-target"></rect>
+            <text x="404" y="317" text-anchor="middle" class="func-mini-text">Smooth muscle, cardiac muscle, glands</text>
+          </svg>
           <p class="structure-text">
             The sympathetic division primes the body for fight-or-flight by mobilizing glucose, redirecting blood to skeletal muscle,
             and increasing alertness during stress.
